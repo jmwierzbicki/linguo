@@ -15,7 +15,7 @@ import type { TranslateOptions } from './types';
  * ```
  *
  * The key is the source text; a missing key renders as itself. ICU `params` are
- * applied by the formatter from `@ng-linguo/icu` (`provideIcu`); without it the
+ * applied by the formatter from `@ng-linguo/linguo/icu` (`provideIcu`); without it the
  * message is returned unformatted.
  *
  * Impure so it re-evaluates against the store's signals on each change

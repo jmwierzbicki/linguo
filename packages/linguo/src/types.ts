@@ -10,7 +10,7 @@ export type Translations = Readonly<Record<string, string>>;
  * Strategy for fetching the {@link Translations} for a given language.
  *
  * Implementations live in their own packages (for example
- * `@ng-linguo/loader-http`); `@ng-linguo/core` only depends on this interface
+ * `@ng-linguo/linguo/http`); `@ng-linguo/linguo` only depends on this interface
  * so it never reaches for `fetch`/XHR itself.
  */
 export interface TranslationLoader {
@@ -41,7 +41,7 @@ export interface TranslateConfig {
  * `{{ 'Hello {$name}!' | t: { params: { name } } }}`.
  */
 export interface TranslateOptions {
-  /** ICU arguments, formatted via `@ng-linguo/icu` when provided. */
+  /** ICU arguments, formatted via `@ng-linguo/linguo/icu` when provided. */
   readonly params?: Record<string, unknown>;
   /**
    * Disambiguating/contextual text for keys that share the same source text.

@@ -2,7 +2,7 @@ import type { PoEntry } from './po';
 
 // Joins context and key in the runtime dictionary. This is the gettext
 // `pgettext` convention (the EOT control character) and MUST stay identical to
-// `@ng-linguo/core`'s `contextKey`, so a contextual key compiled here resolves
+// `@ng-linguo/linguo`'s `contextKey`, so a contextual key compiled here resolves
 // at runtime.
 const CONTEXT_GLUE = String.fromCharCode(4);
 
