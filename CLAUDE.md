@@ -109,7 +109,8 @@ ng-linguo/
       as `peerDependencies`, not `dependencies`
 - [ ] `packages/*/ng-package.json` configured for ng-packagr
 - [ ] Jest configured with `jest-preset-angular`
-- [ ] CI: lint, test, build, `nx affected` for PR speed
+- [ ] CI runs `nx run-many -t lint test build` on push/PR (full suite — the
+      repo is small enough that `affected` isn't worth the hollow-green risk)
 - [ ] Changesets (`@changesets/cli`) for versioning — **not** lerna, **not**
       semantic-release
 

@@ -7,7 +7,6 @@ on:
   pull_request:
 
 permissions:
-  actions: read
   contents: read
 
 jobs:
@@ -15,8 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 
@@ -28,15 +25,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # The translator contract (CLAUDE.md §5.1): translator content is never
-      # inserted as HTML. Fail the build if `innerHTML` appears in core source.
-      - name: Guard against innerHTML in core
+      # inserted as HTML. Fail the build if `innerHTML` appears in runtime source.
+      - name: Guard against innerHTML in the runtime
         run: |
-          if grep -rn "innerHTML" packages/core/src; then
-            echo "innerHTML is forbidden in packages/core/src (CLAUDE.md §5.1)"
+          if grep -rn "innerHTML" packages/linguo/src; then
+            echo "innerHTML is forbidden in packages/linguo/src (CLAUDE.md §5.1)"
             exit 1
           fi
 
-      - name: Set Nx base/head SHAs for `affected`
-        uses: nrwl/nx-set-shas@v4
-
-      - run: pnpm exec nx affected -t lint test build
+      - run: pnpm exec nx run-many -t lint test build
