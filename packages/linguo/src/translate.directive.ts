@@ -73,7 +73,7 @@ export class TranslateDirective implements OnInit {
 
   /** Source message (the translation key); may contain ICU and BBCode. */
   readonly message = input.required<string>({ alias: 't' });
-  /** ICU arguments, formatted via `@ng-linguo/icu` when provided. */
+  /** ICU arguments, formatted via `@ng-linguo/linguo/icu` when provided. */
   readonly tParams = input<Record<string, unknown> | undefined>(undefined);
   /** Optional disambiguating/contextual text (part of the key). */
   readonly tContext = input<string>('');

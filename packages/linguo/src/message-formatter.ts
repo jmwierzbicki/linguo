@@ -3,7 +3,7 @@ import { InjectionToken } from '@angular/core';
 /**
  * Formats a resolved message against runtime arguments — the seam that lets the
  * `translate` pipe render ICU messages without `core` depending on any ICU
- * library. `@ng-linguo/icu`'s `provideIcu` supplies an implementation; when none
+ * library. `@ng-linguo/linguo/icu`'s `provideIcu` supplies an implementation; when none
  * is provided the pipe simply returns the message unformatted.
  */
 export interface MessageFormatter {
@@ -18,7 +18,7 @@ export interface MessageFormatter {
 
 /**
  * DI token for an optional {@link MessageFormatter}. Provided by
- * `@ng-linguo/icu`'s `provideIcu`; absent by default.
+ * `@ng-linguo/linguo/icu`'s `provideIcu`; absent by default.
  */
 export const MESSAGE_FORMATTER = new InjectionToken<MessageFormatter>(
   'ng-linguo.message-formatter',
