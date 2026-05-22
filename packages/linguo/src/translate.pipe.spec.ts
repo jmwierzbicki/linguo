@@ -92,3 +92,44 @@ describe('TranslatePipe', () => {
     expect(fixture.nativeElement.textContent.trim()).toBe('Hi {name}');
   });
 });
+
+describe('TranslatePipe — memoization', () => {
+  async function pipeWithSpy() {
+    setup();
+    const store = TestBed.inject(TranslateStore);
+    await store.setLang('en');
+    const pipe = TestBed.runInInjectionContext(() => new TranslatePipe());
+    const lookups = jest.spyOn(store, 'translate');
+    return { store, pipe, lookups };
+  }
+
+  it('does not re-translate when key, params, and language are unchanged', async () => {
+    const { pipe, lookups } = await pipeWithSpy();
+    pipe.transform('Play');
+    pipe.transform('Play');
+    pipe.transform('Play');
+    expect(lookups).toHaveBeenCalledTimes(1);
+  });
+
+  it('treats a fresh params object with equal contents as a cache hit', async () => {
+    const { pipe, lookups } = await pipeWithSpy();
+    pipe.transform('Hi {name}', { params: { name: 'Ada' } });
+    pipe.transform('Hi {name}', { params: { name: 'Ada' } }); // new object, same content
+    expect(lookups).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-translates when the params content changes', async () => {
+    const { pipe, lookups } = await pipeWithSpy();
+    pipe.transform('Hi {name}', { params: { name: 'Ada' } });
+    pipe.transform('Hi {name}', { params: { name: 'Bo' } });
+    expect(lookups).toHaveBeenCalledTimes(2);
+  });
+
+  it('re-translates after the language changes', async () => {
+    const { store, pipe, lookups } = await pipeWithSpy();
+    expect(pipe.transform('Play')).toBe('Play');
+    await store.setLang('pl');
+    expect(pipe.transform('Play')).toBe('Odtwarzaj');
+    expect(lookups).toHaveBeenCalledTimes(2);
+  });
+});

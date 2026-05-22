@@ -129,8 +129,17 @@ TypeScript use `injectTranslate()`.
 import { injectTranslate } from '@ng-linguo/linguo';
 
 const t = injectTranslate();
-t('Hello {$name}!', { params: { name: 'Ada' } }); // reactive when read in a computed
+
+// Reactive AND zero per-change-detection cost: recomputes only when `name()`
+// or the active language changes. Prefer this for hot or looped bindings.
+readonly greeting = computed(() => t('Hello {$name}!', { params: { name: this.name() } }));
 ```
+
+> **Performance:** the `t` pipe is memoized — the lookup/format re-runs only when
+> the key, `params` contents, `context`, or language actually change (so a fresh
+> `{ params: … }` literal each change-detection pass is just an equality check).
+> For hot paths, the `injectTranslate()` + `computed()` form above does no work
+> per change-detection pass at all.
 
 ## Extraction CLI
 
