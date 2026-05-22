@@ -46,23 +46,44 @@ Requires **Angular 18+**. `@ngrx/signals` is a peer dependency — bring your ow
 
 ## Quick start
 
-**1. Configure the runtime.** Provide a loader; loading is explicit, so no HTTP
-fires during DI setup.
+**1. Configure the runtime.** Pick a loader. Loading is explicit — nothing is
+fetched during DI setup.
+
+Most apps load their translation JSON over HTTP:
 
 ```ts
-import { provideTranslate, type TranslationLoader } from '@ng-linguo/linguo';
+import { provideTranslate } from '@ng-linguo/linguo';
+import { createHttpLoader } from '@ng-linguo/linguo/http';
 import { provideIcu } from '@ng-linguo/linguo/icu';
-
-const loader: TranslationLoader = {
-  load: (lang) => fetch(`/assets/i18n/${lang}.json`).then((r) => r.json()),
-};
+import { provideHttpClient } from '@angular/common/http';
 
 export const appConfig = {
   providers: [
-    provideTranslate({ defaultLang: 'en', loader }),
+    provideHttpClient(),
+    provideTranslate({
+      defaultLang: 'en',
+      // factory form: the loader is built in DI, so it can use HttpClient.
+      // GETs /assets/i18n/<lang>.json by default.
+      loader: () => createHttpLoader(),
+    }),
     provideIcu(), // optional — enables ICU MessageFormat (defaults to MF2)
   ],
 };
+```
+
+Prefer to **bundle** translations (no network)? A loader is just an object with
+a `load(lang)` method, so a static import works too:
+
+```ts
+import en from './i18n/en.json';
+import pl from './i18n/pl.json';
+
+const dictionaries: Record<string, unknown> = { en, pl };
+
+provideTranslate({
+  defaultLang: 'en',
+  loader: { load: (lang) => Promise.resolve(dictionaries[lang] ?? {}) },
+});
 ```
 
 **2. Start the first load** (explicit — e.g. in your root component or an app
