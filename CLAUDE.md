@@ -1,7 +1,7 @@
 # CLAUDE.md — ng-linguo
 
-A modern, complete i18n solution for Angular 21+ applications, built on
-SignalStore.
+A modern, complete i18n solution for Angular 18+ applications, built on
+SignalStore. Developed on Angular 21; the supported floor is 18.
 
 This file is the source of truth for project conventions. Read it fully before
 making changes. When in doubt, follow it literally rather than improvising.
@@ -34,7 +34,8 @@ without making the developer's life harder?_
 
 - Node.js 20.x LTS or 22.x LTS — pin in `.nvmrc`
 - pnpm 9+ — **never use npm or yarn** for this repo
-- Angular 21+ (do not downgrade for "compatibility")
+- Angular 18+ supported (the floor — gated by `@ngrx/signals` stable
+  `signalStore` and signal inputs/queries); developed on Angular 21
 - `@ngrx/signals` 18+
 
 ### 1.2 Bootstrap
