@@ -1,8 +1,8 @@
 # ng-linguo
 
 **Signal-native internationalization for Angular.** A modern, complete i18n
-toolkit for Angular 18+, built on SignalStore — a from-scratch successor to
-`@ngx-translate/core` and an alternative to Transloco, reactive by default with
+toolkit for Angular 18+, built on SignalStore — an independent, from-scratch
+alternative to `@ngx-translate/core` and Transloco, reactive by default with
 zero RxJS plumbing in your components.
 
 ```html

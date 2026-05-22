@@ -11,8 +11,9 @@ making changes. When in doubt, follow it literally rather than improvising.
 ## 0. What this project is
 
 **ng-linguo** is a publishable Angular library family under the `@ng-linguo/*`
-npm scope. It replaces `@ngx-translate/core` and competes with Transloco.
-It is **not** an extension of `ngx-translate`. It is a from-scratch successor.
+npm scope. It is an independent, from-scratch **alternative** to
+`@ngx-translate/core` and Transloco — not affiliated with, derived from, or an
+extension of either project.
 
 The core API is a **SignalStore** (`@ngrx/signals`), not a service class.
 Consumers inject a store, read translations via signals, and the whole runtime
