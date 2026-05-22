@@ -3,33 +3,24 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
-import { provideTranslate, type TranslationLoader, type Translations } from '@ng-linguo/linguo';
+import { provideTranslate } from '@ng-linguo/linguo';
+import { createHttpLoader } from '@ng-linguo/linguo/http';
 import { provideIcu } from '@ng-linguo/linguo/icu';
 
 import { appRoutes } from './app.routes';
-import en from '../assets/i18n/en.json';
-import pl from '../assets/i18n/pl.json';
-import de from '../assets/i18n/de.json';
-
-/**
- * The runtime dictionaries compiled from `apps/playground/i18n/*.po` by
- * `@ng-linguo/extract` (`linguo-extract compile`). They are imported statically
- * here so the playground runs without a backend; a real app would fetch them
- * with `@ng-linguo/linguo/http`.
- */
-const dictionaries: Record<string, Translations> = { en, pl, de };
-
-const demoLoader: TranslationLoader = {
-  load: (lang) => Promise.resolve(dictionaries[lang] ?? {}),
-};
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
     provideBrowserGlobalErrorListeners(),
     provideRouter(appRoutes),
-    provideTranslate({ defaultLang: 'en', loader: demoLoader }),
+    provideHttpClient(),
+    // Fetch the runtime dictionaries (compiled from i18n/*.po by
+    // `linguo-extract compile`) as static files from public/i18n, served at
+    // /i18n/<lang>.json. The factory form lets createHttpLoader inject HttpClient.
+    provideTranslate({ defaultLang: 'en', loader: () => createHttpLoader({ prefix: '/i18n/' }) }),
     provideIcu({ defaultFormat: 'mf2' }),
   ],
 };

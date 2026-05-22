@@ -3,6 +3,6 @@
   "sourceLocale": "en",
   "src": "src",
   "catalogs": "i18n",
-  "output": "src/assets/i18n",
+  "output": "public/i18n",
   "referenceBase": "workspace"
 }
