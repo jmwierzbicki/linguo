@@ -1,3 +1,4 @@
+import { InjectionToken, inject } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { provideTranslate } from './provide-translate';
@@ -70,5 +71,25 @@ describe('TranslateStore', () => {
     });
     await store.setLang('en');
     expect(store.translate('Play')).toBe('Play');
+  });
+
+  it('accepts a loader factory and runs it inside the injection context', async () => {
+    // A factory loader can inject DI tokens — the mechanism createHttpLoader
+    // relies on (it injects HttpClient).
+    const GREETING = new InjectionToken<string>('greeting', { factory: () => 'Hej' });
+    TestBed.configureTestingModule({
+      providers: [
+        provideTranslate({
+          defaultLang: 'en',
+          loader: (): TranslationLoader => {
+            const greeting = inject(GREETING);
+            return { load: () => Promise.resolve({ greeting }) };
+          },
+        }),
+      ],
+    });
+    const store = TestBed.inject(TranslateStore);
+    await store.setLang('en');
+    expect(store.translate('greeting')).toBe('Hej');
   });
 });

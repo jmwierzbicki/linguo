@@ -2,7 +2,7 @@ import { InjectionToken, inject } from '@angular/core';
 import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals';
 
 import { contextKey, normalizeKey } from './normalize';
-import type { TranslateConfig, Translations } from './types';
+import type { TranslateConfig, TranslationLoader, Translations } from './types';
 
 /**
  * DI token carrying the {@link TranslateConfig} supplied via `provideTranslate`.
@@ -10,6 +10,14 @@ import type { TranslateConfig, Translations } from './types';
  * providing this token directly.
  */
 export const TRANSLATE_CONFIG = new InjectionToken<TranslateConfig>('ng-linguo.config');
+
+/**
+ * DI token carrying the resolved {@link TranslationLoader}. `provideTranslate`
+ * registers it from the config's `loader` — either directly (a ready-made
+ * loader) or via a factory run inside the injection context (so loaders that
+ * inject Angular services, like `createHttpLoader`, can be used). Internal.
+ */
+export const TRANSLATION_LOADER = new InjectionToken<TranslationLoader>('ng-linguo.loader');
 
 interface TranslateState {
   readonly currentLang: string;
@@ -46,14 +54,14 @@ export const TranslateStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withMethods((store) => {
-    const config = inject(TRANSLATE_CONFIG);
+    const loader = inject(TRANSLATION_LOADER);
     return {
       /**
        * Load the translations for `lang` and make them current. Resolves once
        * the loader has returned and the store is ready.
        */
       async setLang(lang: string): Promise<void> {
-        const translations = await config.loader.load(lang);
+        const translations = await loader.load(lang);
         patchState(store, { currentLang: lang, translations, isReady: true });
       },
       /**

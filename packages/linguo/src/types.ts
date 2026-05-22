@@ -32,8 +32,18 @@ export interface TranslationLoader {
 export interface TranslateConfig {
   /** Language the store reports as current before anything is loaded. */
   readonly defaultLang: string;
-  /** Loader used to fetch translations for a language. */
-  readonly loader: TranslationLoader;
+  /**
+   * How translations are fetched. Either a ready-made {@link TranslationLoader}
+   * (e.g. a static dictionary or a `fetch`-based loader), or a **factory** that
+   * returns one. The factory runs inside Angular's injection context, so use it
+   * for loaders that inject Angular services — such as `createHttpLoader()` from
+   * `@ng-linguo/linguo/http`, which needs `HttpClient`:
+   *
+   * ```ts
+   * provideTranslate({ defaultLang: 'en', loader: () => createHttpLoader() });
+   * ```
+   */
+  readonly loader: TranslationLoader | (() => TranslationLoader);
 }
 
 /**
