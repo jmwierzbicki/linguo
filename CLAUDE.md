@@ -399,8 +399,12 @@ These protect the _product_, not just code quality:
   store's public API.** Signals out, methods in.
 - **Never reach into another store's internal state.** Stores communicate via
   their public surface or via injected dependencies.
-- **Never write code that assumes the browser locale.** Locale is always
-  explicit, sourced from configuration.
+- **Browser-locale detection is allowed, but always config-controlled and never
+  the only source.** `restoreLang()` may use `navigator.languages` to choose a
+  first-run language, matched against the configured `supportedLangs`; it is on
+  by default but disableable (`detectBrowserLanguage: false`), and `defaultLang`
+  is always the guaranteed fallback. All locale/storage access must stay
+  SSR-safe (go through `DOCUMENT.defaultView`, which is null on the server).
 - **Never modify a generated file by hand** (`*.d.ts` outputs, `dist/`,
   lockfiles via text editing). Regenerate.
 - **Never disable ESLint rules inline without a comment explaining why and a

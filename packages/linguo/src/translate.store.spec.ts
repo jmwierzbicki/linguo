@@ -16,6 +16,15 @@ function setup(loader: TranslationLoader, defaultLang = 'en'): InstanceType<type
 }
 
 describe('TranslateStore', () => {
+  // setLang now persists to localStorage by default — keep tests isolated.
+  afterEach(() => {
+    try {
+      localStorage.clear();
+    } catch {
+      /* storage unavailable */
+    }
+  });
+
   it('reports the configured default language before anything is loaded', () => {
     const store = setup({ load: () => Promise.resolve({}) }, 'pl');
     expect(store.currentLang()).toBe('pl');
@@ -91,5 +100,59 @@ describe('TranslateStore', () => {
     const store = TestBed.inject(TranslateStore);
     await store.setLang('en');
     expect(store.translate('greeting')).toBe('Hej');
+  });
+});
+
+describe('TranslateStore — language persistence & restoreLang', () => {
+  const KEY = 'ng-linguo.lang';
+  const noop: TranslationLoader = { load: (lang) => Promise.resolve({ lang }) };
+
+  afterEach(() => localStorage.clear());
+
+  function configure(config: Parameters<typeof provideTranslate>[0]) {
+    TestBed.configureTestingModule({ providers: [provideTranslate(config)] });
+    return TestBed.inject(TranslateStore);
+  }
+
+  it('persists the active language to localStorage on setLang (default)', async () => {
+    const store = configure({ defaultLang: 'en', loader: noop });
+    await store.setLang('pl');
+    expect(localStorage.getItem(KEY)).toBe('pl');
+  });
+
+  it('does not persist when persistSelectedLanguage is false', async () => {
+    const store = configure({ defaultLang: 'en', persistSelectedLanguage: false, loader: noop });
+    await store.setLang('pl');
+    expect(localStorage.getItem(KEY)).toBeNull();
+  });
+
+  it('restoreLang loads the persisted language', async () => {
+    localStorage.setItem(KEY, 'de');
+    const store = configure({
+      defaultLang: 'en',
+      supportedLangs: ['en', 'pl', 'de'],
+      loader: noop,
+    });
+    await store.restoreLang();
+    expect(store.currentLang()).toBe('de');
+  });
+
+  it('restoreLang falls back to the default when nothing is persisted or detected', async () => {
+    const store = configure({
+      defaultLang: 'en',
+      supportedLangs: ['en'],
+      detectBrowserLanguage: false,
+      loader: noop,
+    });
+    await store.restoreLang();
+    expect(store.currentLang()).toBe('en');
+    expect(store.isReady()).toBe(true);
+  });
+
+  it('uses a custom persistKey when configured', async () => {
+    const store = configure({ defaultLang: 'en', persistKey: 'my.lang', loader: noop });
+    await store.setLang('pl');
+    expect(localStorage.getItem('my.lang')).toBe('pl');
+    expect(localStorage.getItem(KEY)).toBeNull();
   });
 });

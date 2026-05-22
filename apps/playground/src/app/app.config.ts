@@ -20,7 +20,13 @@ export const appConfig: ApplicationConfig = {
     // Fetch the runtime dictionaries (compiled from i18n/*.po by
     // `linguo-extract compile`) as static files from public/i18n, served at
     // /i18n/<lang>.json. The factory form lets createHttpLoader inject HttpClient.
-    provideTranslate({ defaultLang: 'en', loader: () => createHttpLoader({ prefix: '/i18n/' }) }),
+    provideTranslate({
+      defaultLang: 'en',
+      supportedLangs: ['en', 'pl', 'de'], // used to match a persisted/browser language
+      // persistSelectedLanguage + detectBrowserLanguage default to true:
+      // restoreLang() picks persisted → browser → 'en'.
+      loader: () => createHttpLoader({ prefix: '/i18n/' }),
+    }),
     provideIcu({ defaultFormat: 'mf2' }),
   ],
 };
