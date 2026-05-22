@@ -1,0 +1,9 @@
+export { normalizeMessage } from './lib/normalize';
+export { extractMessages } from './lib/scan';
+export type { SourceFile, ExtractedMessage } from './lib/scan';
+export { parsePo, serializePo } from './lib/po';
+export type { PoEntry } from './lib/po';
+export { mergeCatalog } from './lib/merge';
+export { compileEntries } from './lib/compile';
+export { parseConfig, DEFAULT_CONFIG } from './lib/config';
+export type { LinguoConfig } from './lib/config';

@@ -1,0 +1,23 @@
+{
+  "He was driving incredibly fast!": "Er fuhr unglaublich schnell!",
+  "audio player\u0004Play": "Abspielen",
+  "game\u0004Play": "Spielen",
+  "direction\u0004Right": "Rechts",
+  "correct\u0004Right": "Richtig",
+  "sequence\u0004Order": "Reihenfolge",
+  "purchase\u0004Order": "Bestellung",
+  "no cost\u0004Free": "Kostenlos",
+  "available\u0004Free": "Frei",
+  "Read the [docs]documentation[/docs] to get started": "Lies die [docs]Dokumentation[/docs], um loszulegen",
+  "By continuing you agree to our [terms]Terms of Service[/terms]": "Indem du fortfährst, akzeptierst du unsere [terms]Nutzungsbedingungen[/terms]",
+  "[warn]Warning:[/warn] this action cannot be undone": "[warn]Warnung:[/warn] diese Aktion kann nicht rückgängig gemacht werden",
+  "Hello {$name}!": "Hallo {$name}!",
+  ".input {$count :number} .match $count one {{{$count} file}} * {{{$count} files}}": ".input {$count :number} .match $count one {{{$count} Datei}} * {{{$count} Dateien}}",
+  ".input {$count :number} .match $count one {{{$count} item in your cart}} * {{{$count} items in your cart}}": ".input {$count :number} .match $count one {{{$count} Artikel im Warenkorb}} * {{{$count} Artikel im Warenkorb}}",
+  ".input {$count :number} .match $count 0 {{No new messages}} one {{{$count} new message}} * {{{$count} new messages}}": ".input {$count :number} .match $count 0 {{Keine neuen Nachrichten}} one {{{$count} neue Nachricht}} * {{{$count} neue Nachrichten}}",
+  ".input {$place :number select=ordinal} .match $place one {{You finished {$place}st}} two {{You finished {$place}nd}} few {{You finished {$place}rd}} * {{You finished {$place}th}}": ".input {$place :number select=ordinal} .match $place * {{Du belegst Platz {$place}}}",
+  ".input {$gender :string} .match $gender female {{She invited you}} male {{He invited you}} * {{They invited you}}": ".input {$gender :string} .match $gender female {{Sie hat dich eingeladen}} male {{Er hat dich eingeladen}} * {{Sie haben dich eingeladen}}",
+  ".input {$count :number} .input {$gender :string} .match $count $gender one female {{She has {$count} follower}} one male {{He has {$count} follower}} * female {{She has {$count} followers}} * male {{He has {$count} followers}} * * {{They have {$count} followers}}": ".input {$count :number} .input {$gender :string} .match $count $gender one female {{Sie hat {$count} Follower}} one male {{Er hat {$count} Follower}} * female {{Sie hat {$count} Follower}} * male {{Er hat {$count} Follower}} * * {{Sie haben {$count} Follower}}",
+  "This city has {$n :number} residents": "Diese Stadt hat {$n :number} Einwohner",
+  "Click the button to download {$file}": "Klicke auf die Schaltfläche, um {$file} herunterzuladen"
+}

@@ -1,0 +1,96 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: src/app/app.html:12
+msgid "He was driving incredibly fast!"
+msgstr "Jechał niesamowicie szybko!"
+
+#: src/app/app.html:73
+msgctxt "audio player"
+msgid "Play"
+msgstr "Odtwórz"
+
+#: src/app/app.html:73
+msgctxt "game"
+msgid "Play"
+msgstr "Graj"
+
+#: src/app/app.html:75
+msgctxt "direction"
+msgid "Right"
+msgstr "Prawo"
+
+#: src/app/app.html:75
+msgctxt "correct"
+msgid "Right"
+msgstr "Poprawnie"
+
+#: src/app/app.html:78
+msgctxt "sequence"
+msgid "Order"
+msgstr "Kolejność"
+
+#: src/app/app.html:78
+msgctxt "purchase"
+msgid "Order"
+msgstr "Zamów"
+
+#: src/app/app.html:80
+msgctxt "no cost"
+msgid "Free"
+msgstr "Bezpłatnie"
+
+#: src/app/app.html:80
+msgctxt "available"
+msgid "Free"
+msgstr "Wolny"
+
+#: src/app/app.html:92
+msgid "Read the [docs]documentation[/docs] to get started"
+msgstr "Przeczytaj [docs]dokumentację[/docs], aby rozpocząć"
+
+#: src/app/app.html:98
+msgid "By continuing you agree to our [terms]Terms of Service[/terms]"
+msgstr "Kontynuując, akceptujesz nasz [terms]regulamin[/terms]"
+
+#: src/app/app.html:104
+msgid "[warn]Warning:[/warn] this action cannot be undone"
+msgstr "[warn]Ostrzeżenie:[/warn] tej czynności nie można cofnąć"
+
+#: src/app/app.html:117
+#: src/app/app.ts:76
+msgid "Hello {$name}!"
+msgstr "Cześć {$name}!"
+
+#: src/app/app.ts:42
+msgid ".input {$count :number} .match $count one {{{$count} file}} * {{{$count} files}}"
+msgstr ".input {$count :number} .match $count one {{{$count} plik}} few {{{$count} pliki}} many {{{$count} plików}} * {{{$count} pliku}}"
+
+#: src/app/app.ts:45
+msgid ".input {$count :number} .match $count one {{{$count} item in your cart}} * {{{$count} items in your cart}}"
+msgstr ".input {$count :number} .match $count 0 {{Brak produktów w koszyku}} one {{{$count} produkt w koszyku}} few {{{$count} produkty w koszyku}} many {{{$count} produktów w koszyku}} * {{{$count} produktu w koszyku}}"
+
+#: src/app/app.ts:50
+msgid ".input {$count :number} .match $count 0 {{No new messages}} one {{{$count} new message}} * {{{$count} new messages}}"
+msgstr ".input {$count :number} .match $count 0 {{Brak nowych wiadomości}} one {{{$count} nowa wiadomość}} few {{{$count} nowe wiadomości}} many {{{$count} nowych wiadomości}} * {{{$count} nowej wiadomości}}"
+
+#: src/app/app.ts:55
+msgid ".input {$place :number select=ordinal} .match $place one {{You finished {$place}st}} two {{You finished {$place}nd}} few {{You finished {$place}rd}} * {{You finished {$place}th}}"
+msgstr ".input {$place :number select=ordinal} .match $place * {{Zajęto {$place}. miejsce}}"
+
+#: src/app/app.ts:60
+msgid ".input {$gender :string} .match $gender female {{She invited you}} male {{He invited you}} * {{They invited you}}"
+msgstr ".input {$gender :string} .match $gender female {{Zaprosiła Cię}} male {{Zaprosił Cię}} * {{Zaproszono Cię}}"
+
+#: src/app/app.ts:66
+msgid ".input {$count :number} .input {$gender :string} .match $count $gender one female {{She has {$count} follower}} one male {{He has {$count} follower}} * female {{She has {$count} followers}} * male {{He has {$count} followers}} * * {{They have {$count} followers}}"
+msgstr ".input {$count :number} .input {$gender :string} .match $count $gender one female {{Ona ma {$count} osobę obserwującą}} few female {{Ona ma {$count} osoby obserwujące}} many female {{Ona ma {$count} osób obserwujących}} * female {{Ona ma {$count} osoby obserwującej}} one male {{On ma {$count} osobę obserwującą}} few male {{On ma {$count} osoby obserwujące}} many male {{On ma {$count} osób obserwujących}} * male {{On ma {$count} osoby obserwującej}} one * {{Ta osoba ma {$count} osobę obserwującą}} few * {{Ta osoba ma {$count} osoby obserwujące}} many * {{Ta osoba ma {$count} osób obserwujących}} * * {{Ta osoba ma {$count} osoby obserwującej}}"
+
+#: src/app/app.ts:71
+msgid "This city has {$n :number} residents"
+msgstr "To miasto ma {$n :number} mieszkańców"
+
+#: src/app/app.ts:74
+msgid "Click the button to download {$file}"
+msgstr "Kliknij przycisk, aby pobrać {$file}"

@@ -1,0 +1,96 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: src/app/app.html:12
+msgid "He was driving incredibly fast!"
+msgstr "He was driving incredibly fast!"
+
+#: src/app/app.html:73
+msgctxt "audio player"
+msgid "Play"
+msgstr "Play"
+
+#: src/app/app.html:73
+msgctxt "game"
+msgid "Play"
+msgstr "Play"
+
+#: src/app/app.html:75
+msgctxt "direction"
+msgid "Right"
+msgstr "Right"
+
+#: src/app/app.html:75
+msgctxt "correct"
+msgid "Right"
+msgstr "Right"
+
+#: src/app/app.html:78
+msgctxt "sequence"
+msgid "Order"
+msgstr "Order"
+
+#: src/app/app.html:78
+msgctxt "purchase"
+msgid "Order"
+msgstr "Order"
+
+#: src/app/app.html:80
+msgctxt "no cost"
+msgid "Free"
+msgstr "Free"
+
+#: src/app/app.html:80
+msgctxt "available"
+msgid "Free"
+msgstr "Free"
+
+#: src/app/app.html:92
+msgid "Read the [docs]documentation[/docs] to get started"
+msgstr "Read the [docs]documentation[/docs] to get started"
+
+#: src/app/app.html:98
+msgid "By continuing you agree to our [terms]Terms of Service[/terms]"
+msgstr "By continuing you agree to our [terms]Terms of Service[/terms]"
+
+#: src/app/app.html:104
+msgid "[warn]Warning:[/warn] this action cannot be undone"
+msgstr "[warn]Warning:[/warn] this action cannot be undone"
+
+#: src/app/app.html:117
+#: src/app/app.ts:76
+msgid "Hello {$name}!"
+msgstr "Hello {$name}!"
+
+#: src/app/app.ts:42
+msgid ".input {$count :number} .match $count one {{{$count} file}} * {{{$count} files}}"
+msgstr ".input {$count :number} .match $count one {{{$count} file}} * {{{$count} files}}"
+
+#: src/app/app.ts:45
+msgid ".input {$count :number} .match $count one {{{$count} item in your cart}} * {{{$count} items in your cart}}"
+msgstr ".input {$count :number} .match $count one {{{$count} item in your cart}} * {{{$count} items in your cart}}"
+
+#: src/app/app.ts:50
+msgid ".input {$count :number} .match $count 0 {{No new messages}} one {{{$count} new message}} * {{{$count} new messages}}"
+msgstr ".input {$count :number} .match $count 0 {{No new messages}} one {{{$count} new message}} * {{{$count} new messages}}"
+
+#: src/app/app.ts:55
+msgid ".input {$place :number select=ordinal} .match $place one {{You finished {$place}st}} two {{You finished {$place}nd}} few {{You finished {$place}rd}} * {{You finished {$place}th}}"
+msgstr ".input {$place :number select=ordinal} .match $place one {{You finished {$place}st}} two {{You finished {$place}nd}} few {{You finished {$place}rd}} * {{You finished {$place}th}}"
+
+#: src/app/app.ts:60
+msgid ".input {$gender :string} .match $gender female {{She invited you}} male {{He invited you}} * {{They invited you}}"
+msgstr ".input {$gender :string} .match $gender female {{She invited you}} male {{He invited you}} * {{They invited you}}"
+
+#: src/app/app.ts:66
+msgid ".input {$count :number} .input {$gender :string} .match $count $gender one female {{She has {$count} follower}} one male {{He has {$count} follower}} * female {{She has {$count} followers}} * male {{He has {$count} followers}} * * {{They have {$count} followers}}"
+msgstr ".input {$count :number} .input {$gender :string} .match $count $gender one female {{She has {$count} follower}} one male {{He has {$count} follower}} * female {{She has {$count} followers}} * male {{He has {$count} followers}} * * {{They have {$count} followers}}"
+
+#: src/app/app.ts:71
+msgid "This city has {$n :number} residents"
+msgstr "This city has {$n :number} residents"
+
+#: src/app/app.ts:74
+msgid "Click the button to download {$file}"
+msgstr "Click the button to download {$file}"

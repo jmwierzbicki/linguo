@@ -5,15 +5,14 @@ export default [
   ...nx.configs['flat/typescript'],
   ...nx.configs['flat/javascript'],
   {
-    ignores: [
-      '**/dist',
-      '**/vite.config.*.timestamp*',
-      '**/vitest.config.*.timestamp*',
-    ],
+    ignores: ['**/dist'],
   },
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     rules: {
+      // Package boundaries per CLAUDE.md §2.1: `core` depends on nothing else,
+      // libraries may depend on `core` (and each other), apps may depend on
+      // libraries — never the reverse.
       '@nx/enforce-module-boundaries': [
         'error',
         {
@@ -21,20 +20,16 @@ export default [
           allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$'],
           depConstraints: [
             {
-              sourceTag: 'scope:shared',
-              onlyDependOnLibsWithTags: ['scope:shared'],
+              sourceTag: 'type:app',
+              onlyDependOnLibsWithTags: ['type:app', 'type:lib', 'type:core'],
             },
             {
-              sourceTag: 'scope:shop',
-              onlyDependOnLibsWithTags: ['scope:shop', 'scope:shared'],
+              sourceTag: 'type:lib',
+              onlyDependOnLibsWithTags: ['type:lib', 'type:core'],
             },
             {
-              sourceTag: 'scope:api',
-              onlyDependOnLibsWithTags: ['scope:api', 'scope:shared'],
-            },
-            {
-              sourceTag: 'type:data',
-              onlyDependOnLibsWithTags: ['type:data'],
+              sourceTag: 'type:core',
+              onlyDependOnLibsWithTags: ['type:core'],
             },
           ],
         },
@@ -42,17 +37,18 @@ export default [
     },
   },
   {
-    files: [
-      '**/*.ts',
-      '**/*.tsx',
-      '**/*.cts',
-      '**/*.mts',
-      '**/*.js',
-      '**/*.jsx',
-      '**/*.cjs',
-      '**/*.mjs',
-    ],
-    // Override or add rules here
-    rules: {},
+    files: ['**/*.ts', '**/*.tsx', '**/*.cts', '**/*.mts'],
+    rules: {
+      // CLAUDE.md §2.6 / §3.1: named exports only, no `enum`.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'TSEnumDeclaration',
+          message:
+            'Use string-literal unions or `as const` objects instead of `enum` (CLAUDE.md §2.6).',
+        },
+      ],
+      'import/no-default-export': 'off',
+    },
   },
 ];

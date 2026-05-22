@@ -1,0 +1,15 @@
+{
+  "name": "@ng-linguo/extract",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "bin": {
+    "linguo-extract": "./src/cli.js"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.4.0",
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}
