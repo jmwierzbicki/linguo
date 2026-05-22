@@ -1,0 +1,9 @@
+[
+  { "input": "Play", "output": "Play" },
+  { "input": "  Play  ", "output": "Play" },
+  { "input": "Hello    world", "output": "Hello world" },
+  { "input": "Hello\n\t  world", "output": "Hello world" },
+  { "input": "   \n  ", "output": "" },
+  { "input": "Read the [link]docs[/link] now", "output": "Read the [link]docs[/link] now" },
+  { "input": "  Multi\n  line\n  message  ", "output": "Multi line message" }
+]

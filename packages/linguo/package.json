@@ -1,0 +1,15 @@
+{
+  "name": "@ng-linguo/linguo",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@ngrx/signals": "^21.0.0",
+    "rxjs": "^7.8.0"
+  },
+  "dependencies": {
+    "intl-messageformat": "^11.2.6",
+    "messageformat": "^4.0.0"
+  },
+  "sideEffects": false
+}

@@ -1,0 +1,126 @@
+<main>
+  <h1>ng-linguo playground</h1>
+
+  <p>Current language: {{ currentLang() }} · ready: {{ isReady() }}</p>
+
+  <nav class="langs">
+    <button type="button" (click)="setLang('en')">English</button>
+    <button type="button" (click)="setLang('pl')">Polski</button>
+    <button type="button" (click)="setLang('de')">Deutsch</button>
+  </nav>
+
+  <p t="He was driving incredibly fast!"></p>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       1. CARDINAL PLURALS — EN one/other · PL one/few/many/other · DE one/other
+       Drag the counter through 1, 2, 5, 22 to see Polish switch categories.
+       ════════════════════════════════════════════════════════════════════ -->
+  <section>
+    <h2>Plurals</h2>
+    <div class="counter">
+      <button type="button" (click)="addCount(-1)">−</button>
+      <span>count = {{ count() }}</span>
+      <button type="button" (click)="addCount(1)">+</button>
+    </div>
+    <ul>
+      <li>{{ msgFiles | t: { params: { count: count() } } }}</li>
+      <li>{{ msgCartItems | t: { params: { count: count() } } }}</li>
+      <!-- Exact `0` variant: "No new messages" instead of "0 new messages". -->
+      <li>{{ msgUnread | t: { params: { count: count() } } }}</li>
+    </ul>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       2. ORDINALS — EN 1st/2nd/3rd/4th vs PL/DE "1." (different category set)
+       ════════════════════════════════════════════════════════════════════ -->
+  <section>
+    <h2>Ordinals</h2>
+    <div class="counter">
+      <button type="button" (click)="addPlace(-1)">−</button>
+      <span>place = {{ place() }}</span>
+      <button type="button" (click)="addPlace(1)">+</button>
+    </div>
+    <p>{{ msgRank | t: { params: { place: place() } } }}</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       3. GENDER — select on a string; PL changes the past-tense verb form
+       ════════════════════════════════════════════════════════════════════ -->
+  <section>
+    <h2>Gender</h2>
+    <button type="button" (click)="toggleGender()">gender = {{ gender() }}</button>
+    <p>{{ msgInvited | t: { params: { gender: gender() } } }}</p>
+    <!-- Two selectors at once: count × gender. -->
+    <p>{{ msgFollowers | t: { params: { count: count(), gender: gender() } } }}</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       4. NUMBER FORMATTING — locale grouping separators differ automatically
+       EN 1,234,567 · DE 1.234.567 · PL 1 234 567
+       ════════════════════════════════════════════════════════════════════ -->
+  <section>
+    <h2>Numbers</h2>
+    <p>{{ msgPopulation | t: { params: { n: 1234567 } } }}</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       5. CONTEXT — same source text, different meaning ⇒ different translation
+       `context` is part of the key (gettext msgctxt) and doubles as a note.
+       ════════════════════════════════════════════════════════════════════ -->
+  <section>
+    <h2>Context (homonyms)</h2>
+    <ul>
+      <li>{{ 'Play' | t: { context: 'audio player' } }} / {{ 'Play' | t: { context: 'game' } }}</li>
+      <li>
+        {{ 'Right' | t: { context: 'direction' } }} / {{ 'Right' | t: { context: 'correct' } }}
+      </li>
+      <li>
+        {{ 'Order' | t: { context: 'sequence' } }} / {{ 'Order' | t: { context: 'purchase' } }}
+      </li>
+      <li>{{ 'Free' | t: { context: 'no cost' } }} / {{ 'Free' | t: { context: 'available' } }}</li>
+    </ul>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       6. BBCODE PLACEHOLDERS — translators see [tag]…[/tag], never HTML.
+       The directive binds each tag to an <ng-template tFor>; word order
+       (and thus tag position) differs in German.
+       ════════════════════════════════════════════════════════════════════ -->
+  <section>
+    <h2>Rich text (BBCode placeholders)</h2>
+
+    <p t="Read the [docs]documentation[/docs] to get started">
+      <ng-template tFor="docs" let-text>
+        <a href="https://nx.dev" target="_blank" rel="noreferrer">{{ text }}</a>
+      </ng-template>
+    </p>
+
+    <p t="By continuing you agree to our [terms]Terms of Service[/terms]">
+      <ng-template tFor="terms" let-text>
+        <a href="/terms">{{ text }}</a>
+      </ng-template>
+    </p>
+
+    <p t="[warn]Warning:[/warn] this action cannot be undone">
+      <ng-template tFor="warn" let-text>
+        <strong>{{ text }}</strong>
+      </ng-template>
+    </p>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       7. WORD ORDER + placeholders — German pushes the verb to clause end
+       ════════════════════════════════════════════════════════════════════ -->
+  <section>
+    <h2>Word order</h2>
+    <!-- ICU via the directive: message in the attribute (so { } is safe). -->
+    <p t="Hello {$name}!" [tParams]="{ name: 'Boba' }"></p>
+    <!-- ICU via the pipe: message is a property, params in the options object. -->
+    <p>{{ greeting | t: { params: { name: 'Ada' } } }}</p>
+    <p>{{ msgDownload | t: { params: { file: 'report.pdf' } } }}</p>
+    <!-- injectTranslate(): the t pipe's counterpart in component code (TS). -->
+    <p>{{ greetingFromTs() }}</p>
+  </section>
+</main>
+
+<router-outlet></router-outlet>

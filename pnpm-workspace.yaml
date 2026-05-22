@@ -1,0 +1,19 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+allowBuilds:
+  '@swc/core': true
+  nx: true
+  nx-cloud: true
+  esbuild: true
+  '@parcel/watcher': true
+  unrs-resolver: true
+  less: true
+  lmdb: true
+  msgpackr-extract: true
+# Pin the jest runtime stack to one version so jest-runtime 30.4 and the test
+# environment share a jest-mock with the same mocker API (avoids the duplicate
+# jest-mock@30.3 / @30.4 → clearMocksOnScope TypeError).
+overrides:
+  jest-mock: 30.4.1
+  jest-environment-node: 30.4.1

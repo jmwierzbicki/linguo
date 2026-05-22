@@ -1,0 +1,8 @@
+{
+  "locales": ["en", "pl", "de"],
+  "sourceLocale": "en",
+  "src": "src",
+  "catalogs": "i18n",
+  "output": "src/assets/i18n",
+  "referenceBase": "workspace"
+}
