@@ -62,6 +62,7 @@ export const appConfig = {
     provideHttpClient(),
     provideTranslate({
       defaultLang: 'en',
+      supportedLangs: ['en', 'pl', 'de'], // languages you ship (used for matching)
       // factory form: the loader is built in DI, so it can use HttpClient.
       // GETs /assets/i18n/<lang>.json by default.
       loader: () => createHttpLoader(),
@@ -86,18 +87,24 @@ provideTranslate({
 });
 ```
 
-**2. Start the first load** (explicit — e.g. in your root component or an app
-initializer). `isReady` lets you gate the UI to avoid a flash of untranslated
-content:
+**2. Start loading** at startup. `restoreLang()` picks the language for you —
+**persisted choice → browser preference → `defaultLang`** — and loads it.
+`isReady` lets you gate the UI to avoid a flash of untranslated content:
 
 ```ts
 import { inject } from '@angular/core';
 import { TranslateStore } from '@ng-linguo/linguo';
 
 private store = inject(TranslateStore);
-constructor() { void this.store.setLang('en'); }
+constructor() { void this.store.restoreLang(); }
 readonly ready = this.store.isReady; // Signal<boolean>
 ```
+
+The active language is remembered in `localStorage`, and the browser's preferred
+language is used on the first visit — both **on by default** and **SSR-safe**.
+Set `supportedLangs` so a stored/browser value can be matched; turn either off
+with `persistSelectedLanguage: false` / `detectBrowserLanguage: false`. To switch
+languages later, call `store.setLang('pl')` (it also updates the saved choice).
 
 **3. Translate.** In templates use the `t` pipe and the `[t]` directive; in
 TypeScript use `injectTranslate()`.

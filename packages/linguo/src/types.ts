@@ -44,6 +44,26 @@ export interface TranslateConfig {
    * ```
    */
   readonly loader: TranslationLoader | (() => TranslationLoader);
+  /**
+   * Languages the app ships. Used by {@link TranslateStore.restoreLang} to match
+   * a persisted or browser-preferred value to one that actually exists. Browser
+   * matching is skipped when this is omitted (so an unshipped language is never
+   * auto-selected).
+   */
+  readonly supportedLangs?: readonly string[];
+  /**
+   * Persist the active language to `localStorage` and restore it on startup.
+   * Defaults to `true`. SSR-safe (a no-op when not running in a browser).
+   */
+  readonly persistSelectedLanguage?: boolean;
+  /** `localStorage` key for the persisted language. Defaults to `ng-linguo.lang`. */
+  readonly persistKey?: string;
+  /**
+   * On first run (nothing persisted), use the browser's preferred language
+   * (`navigator.languages`) matched against {@link supportedLangs}. Defaults to
+   * `true`. SSR-safe.
+   */
+  readonly detectBrowserLanguage?: boolean;
 }
 
 /**

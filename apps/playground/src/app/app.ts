@@ -32,6 +32,11 @@ export class App {
   protected readonly currentLang = this.store.currentLang;
   protected readonly isReady = this.store.isReady;
 
+  constructor() {
+    // Pick the startup language: persisted → browser → default ('en').
+    void this.store.restoreLang();
+  }
+
   // ── Interactive state driving the examples ────────────────────────────────
   protected readonly count = signal(1);
   protected readonly place = signal(1);
