@@ -1,12 +1,18 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
 import { copyToClipboard } from './lib/clipboard';
-import { DEFAULT_CONFIG, findConfigFile, parseConfig, type LinguoConfig } from './lib/config';
+import {
+  DEFAULT_CONFIG,
+  findConfigFile,
+  parseConfig,
+  serializeConfig,
+  type LinguoConfig,
+} from './lib/config';
 import { buildTranslationPrompt, resolveTargetLocale } from './lib/prompt';
 import { compileCatalogs, extractToCatalogs, type ExtractStats } from './lib/runner';
-import { runInteractive } from './interactive';
+import { runInit, runInteractive } from './interactive';
 
 /** Flags that take a following value (`--name value`), used to skip them when
  * scanning for the positional argument. */
@@ -197,12 +203,53 @@ async function main(argv: readonly string[]): Promise<void> {
     return;
   }
 
+  if (command === 'init') {
+    // On a TTY (and without --locales), open the interactive create/edit form.
+    if (process.stdin.isTTY && process.stdout.isTTY && flag(rest, 'locales') === undefined) {
+      await runInit();
+      return;
+    }
+    // Non-interactive: build from flags + defaults (scriptable / CI).
+    const localesFlag = flag(rest, 'locales');
+    if (localesFlag === undefined) {
+      throw new Error(
+        'init: provide --locales en,pl[,…] for non-interactive use, or run it in a terminal for the interactive form.',
+      );
+    }
+    const locales = localesFlag.split(',').filter(Boolean);
+    if (locales.length === 0) {
+      throw new Error('init: --locales must list at least one locale code.');
+    }
+    const refFlag = flag(rest, 'reference-base');
+    const config: LinguoConfig = {
+      locales,
+      sourceLocale: flag(rest, 'source-locale') ?? DEFAULT_CONFIG.sourceLocale,
+      src: flag(rest, 'src') ?? DEFAULT_CONFIG.src,
+      catalogs: flag(rest, 'catalogs') ?? DEFAULT_CONFIG.catalogs,
+      output: flag(rest, 'out') ?? DEFAULT_CONFIG.output,
+      referenceBase: refFlag === 'workspace' ? 'workspace' : DEFAULT_CONFIG.referenceBase,
+    };
+    const target = resolve(process.cwd(), flag(rest, 'config') ?? 'linguo.config.json');
+    const existed = existsSync(target);
+    if (existed && !hasFlag(rest, 'force')) {
+      throw new Error(`${target} already exists. Pass --force to overwrite.`);
+    }
+    writeFileSync(target, serializeConfig(config), 'utf8');
+    process.stdout.write(`${existed ? 'Overwrote' : 'Created'} ${target}\n`);
+    return;
+  }
+
   process.stderr.write(
     [
       'Usage: linguo-extract [command] [options]',
       '',
-      'Run with no command in a terminal to open the guided interactive menu.',
+      'Run with no command in a terminal to open the guided interactive menu',
+      '(which can also create or edit linguo.config.json).',
       'Reads linguo.config.json (found automatically, or --config <path>); flags override.',
+      '',
+      '  init    [--locales en,pl] [--source-locale en] [--src <dir>] [--catalogs <dir>]',
+      '          [--out <dir>] [--reference-base config|workspace] [--force]',
+      '          Create (or, in a terminal, create/edit) linguo.config.json.',
       '',
       '  extract [--config <path>] [--src <dir>] [--out <dir>] [--locales en,pl] [--source-locale en]',
       '          Scan sources and create/update <locale>.po catalogs.',

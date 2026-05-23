@@ -2,7 +2,13 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { CONFIG_FILENAME, DEFAULT_CONFIG, findConfigFile, parseConfig } from './config';
+import {
+  CONFIG_FILENAME,
+  DEFAULT_CONFIG,
+  findConfigFile,
+  parseConfig,
+  serializeConfig,
+} from './config';
 
 describe('parseConfig', () => {
   it('parses a full config', () => {
@@ -56,6 +62,26 @@ describe('parseConfig', () => {
 
   it('throws on invalid JSON', () => {
     expect(() => parseConfig('{ not json')).toThrow(/JSON/);
+  });
+});
+
+describe('serializeConfig', () => {
+  it('round-trips through parseConfig', () => {
+    const config = {
+      locales: ['en', 'pl', 'de'],
+      sourceLocale: 'en',
+      src: 'app/src',
+      catalogs: 'i18n',
+      output: 'public/i18n',
+      referenceBase: 'workspace' as const,
+    };
+    expect(parseConfig(serializeConfig(config))).toEqual(config);
+  });
+
+  it('writes pretty JSON with a trailing newline', () => {
+    const text = serializeConfig({ locales: ['en'], ...DEFAULT_CONFIG });
+    expect(text.endsWith('}\n')).toBe(true);
+    expect(text).toContain('\n  "locales": [');
   });
 });
 

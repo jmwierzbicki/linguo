@@ -147,11 +147,15 @@ readonly greeting = computed(() => t('Hello {$name}!', { params: { name: this.na
 source into translation files and back:
 
 ```bash
-npx linguo-extract              # guided interactive menu
+npx linguo-extract              # guided interactive menu (creates/edits config too)
+linguo-extract init             # create or edit linguo.config.json (interactive)
 linguo-extract extract          # scan source → <locale>.po catalogs
 linguo-extract compile          # .po catalogs → runtime <locale>.json
 linguo-extract copyprompt pl    # copy an LLM translation prompt to the clipboard
 ```
+
+`init` also runs non-interactively for scripts/CI:
+`linguo-extract init --locales en,pl,de --out public/i18n`.
 
 It reads a `linguo.config.json` (auto-discovered) listing your locales and paths.
 
