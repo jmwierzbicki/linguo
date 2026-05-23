@@ -1,6 +1,6 @@
 {
   "name": "@ng-linguo/extract",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "The ng-linguo extraction CLI — scans Angular source for translatable messages, manages gettext .po catalogs, and compiles them to runtime JSON. Pure Node, zero Angular deps.",
   "license": "MIT",
   "author": "jmwierzbicki",
