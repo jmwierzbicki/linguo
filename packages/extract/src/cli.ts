@@ -4,14 +4,16 @@ import { dirname, resolve } from 'node:path';
 
 import { copyToClipboard } from './lib/clipboard';
 import {
+  CONFIG_SCHEMA_REF,
   DEFAULT_CONFIG,
   findConfigFile,
   parseConfig,
   serializeConfig,
   type LinguoConfig,
 } from './lib/config';
-import { buildTranslationPrompt, resolveTargetLocale } from './lib/prompt';
+import { buildTranslationPrompt, localeLabel, resolveTargetLocale } from './lib/prompt';
 import { compileCatalogs, extractToCatalogs, type ExtractStats } from './lib/runner';
+import { autoTranslateCatalog, loadTranslator } from './lib/translator';
 import { runInit, runInteractive } from './interactive';
 
 /** Flags that take a following value (`--name value`), used to skip them when
@@ -19,12 +21,14 @@ import { runInit, runInteractive } from './interactive';
 const VALUE_FLAGS = new Set([
   'config',
   'locales',
+  'locale',
   'source-locale',
   'src',
   'catalogs',
   'out',
   'po',
   'reference-base',
+  'translator',
 ]);
 
 function flag(args: readonly string[], name: string): string | undefined {
@@ -96,6 +100,8 @@ function resolveConfig(rest: readonly string[]): Resolved {
       ? refFlag
       : (fromFile?.referenceBase ?? DEFAULT_CONFIG.referenceBase);
 
+  const translator = flag(rest, 'translator') ?? fromFile?.translator;
+
   return {
     baseDir,
     config: {
@@ -106,6 +112,7 @@ function resolveConfig(rest: readonly string[]): Resolved {
       catalogs: flag(rest, 'catalogs') ?? fromFile?.catalogs ?? DEFAULT_CONFIG.catalogs,
       output: fromFile?.output ?? DEFAULT_CONFIG.output,
       referenceBase,
+      ...(translator !== undefined ? { translator } : {}),
     },
   };
 }
@@ -156,6 +163,74 @@ async function main(argv: readonly string[]): Promise<void> {
       poDir: resolve(baseDir, flag(rest, 'po') ?? config.catalogs),
       outDir: resolve(baseDir, flag(rest, 'out') ?? config.output),
     });
+    return;
+  }
+
+  if (command === 'translate') {
+    const { config, baseDir } = resolveConfig(rest);
+    if (config.translator === undefined) {
+      throw new Error(
+        'translate: no "translator" configured. Add a "translator" module path to ' +
+          'linguo.config.json (a module exporting a translate() function), or use ' +
+          '"copyprompt" / the interactive menu for the clipboard flow.',
+      );
+    }
+
+    const all = hasFlag(rest, 'all');
+    const localeFlag = flag(rest, 'locale');
+    if (!all && localeFlag === undefined) {
+      throw new Error('translate: pass --locale <code> or --all.');
+    }
+    if (localeFlag !== undefined && !config.locales.includes(localeFlag)) {
+      throw new Error(
+        `translate: "${localeFlag}" is not a configured locale (${config.locales.join(', ')}).`,
+      );
+    }
+
+    const requested = all ? config.locales : localeFlag !== undefined ? [localeFlag] : [];
+    const targets = requested.filter((l) => l !== config.sourceLocale);
+    if (targets.length === 0) {
+      process.stdout.write('Nothing to translate (only the source locale was selected).\n');
+      return;
+    }
+
+    const translate = await loadTranslator(resolve(baseDir, config.translator));
+    let totalApplied = 0;
+    for (const locale of targets) {
+      const label = localeLabel(locale);
+      const poPath = resolve(baseDir, config.catalogs, `${locale}.po`);
+      if (!existsSync(poPath)) {
+        process.stderr.write(
+          `  ${label}: no catalog at ${poPath} — run "extract" first. Skipped.\n`,
+        );
+        continue;
+      }
+      const outcome = await autoTranslateCatalog({
+        translate,
+        poText: readFileSync(poPath, 'utf8'),
+        targetLocale: locale,
+        targetLabel: label,
+        sourceLocale: config.sourceLocale,
+      });
+      if (outcome.untranslated === 0) {
+        process.stdout.write(`  ${label}: already fully translated.\n`);
+        continue;
+      }
+      writeFileSync(poPath, outcome.po, 'utf8');
+      totalApplied += outcome.applied;
+      const tail = outcome.remaining > 0 ? ` (${outcome.remaining} still missing)` : '';
+      process.stdout.write(
+        `  ${label}: applied ${outcome.applied}/${outcome.untranslated}${tail}.\n`,
+      );
+    }
+
+    if (totalApplied > 0) {
+      compileCatalogs({
+        poDir: resolve(baseDir, config.catalogs),
+        outDir: resolve(baseDir, config.output),
+      });
+      process.stdout.write(`Compiled catalogs → ${config.output}\n`);
+    }
     return;
   }
 
@@ -222,6 +297,7 @@ async function main(argv: readonly string[]): Promise<void> {
     }
     const refFlag = flag(rest, 'reference-base');
     const config: LinguoConfig = {
+      $schema: CONFIG_SCHEMA_REF,
       locales,
       sourceLocale: flag(rest, 'source-locale') ?? DEFAULT_CONFIG.sourceLocale,
       src: flag(rest, 'src') ?? DEFAULT_CONFIG.src,
@@ -256,6 +332,10 @@ async function main(argv: readonly string[]): Promise<void> {
       '',
       '  compile [--config <path>] [--po <dir>] [--out <dir>]',
       '          Compile <locale>.po catalogs into runtime <locale>.json.',
+      '',
+      '  translate (--locale pl | --all) [--config <path>] [--translator <module>]',
+      '          Translate missing entries automatically via the configured "translator"',
+      '          module (one exporting a translate() function), then compile.',
       '',
       '  copyprompt <language> [--config <path>] [--po <dir>] [--stdout]',
       '          Copy an LLM translation prompt for <language>.po to the clipboard.',

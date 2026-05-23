@@ -4,6 +4,7 @@ import { basename, dirname, resolve } from 'node:path';
 import { applyTranslations, isUntranslated } from './lib/apply';
 import { copyToClipboard, readClipboard } from './lib/clipboard';
 import {
+  CONFIG_SCHEMA_REF,
   DEFAULT_CONFIG,
   findConfigFile,
   parseConfig,
@@ -13,6 +14,7 @@ import {
 import { parsePo, serializePo } from './lib/po';
 import { buildTranslationPrompt, localeLabel } from './lib/prompt';
 import { compileCatalogs, extractToCatalogs, type ExtractStats } from './lib/runner';
+import { autoTranslateCatalog, loadTranslator } from './lib/translator';
 
 /**
  * The `@clack/prompts` module, loaded lazily via dynamic `import()`. clack is
@@ -41,6 +43,7 @@ function lerp(a: number, b: number, t: number): number {
 const RESET = '\x1b[0m';
 const BOLD = '\x1b[1m';
 const DIM = '\x1b[2m';
+const RED = '\x1b[31m';
 
 /** The cyan→fuchsia gradient RGB at position `t` in `[0, 1]`. */
 function gradientRgb(t: number): [number, number, number] {
@@ -203,6 +206,33 @@ function countMissing(entries: readonly { readonly msgstr: string }[]): number {
   return entries.filter((e) => isUntranslated(e.msgstr)).length;
 }
 
+/**
+ * The untranslated-entry count for a locale's catalog, or `undefined` when no
+ * catalog exists yet. Used to flag languages in the translate picker.
+ */
+function untranslatedCount(
+  baseDir: string,
+  config: LinguoConfig,
+  locale: string,
+): number | undefined {
+  const poPath = resolve(baseDir, config.catalogs, `${locale}.po`);
+  if (!existsSync(poPath)) {
+    return undefined;
+  }
+  return countMissing(parsePo(readFileSync(poPath, 'utf8')));
+}
+
+/** A select hint describing how many entries a locale still needs translated. */
+function localeHint(missing: number | undefined): string {
+  if (missing === undefined) {
+    return 'no catalog yet — extract first';
+  }
+  if (missing === 0) {
+    return 'fully translated';
+  }
+  return `${RED}${missing} untranslated${RESET}`;
+}
+
 // ── Actions ──────────────────────────────────────────────────────────────────
 
 function runExtract(p: Prompts, config: LinguoConfig, baseDir: string): void {
@@ -230,10 +260,63 @@ function runCompile(p: Prompts, config: LinguoConfig, baseDir: string): void {
   s.stop(`Compiled ${n} dictionar${n === 1 ? 'y' : 'ies'} → ${config.output}`);
 }
 
+/**
+ * Translate a catalog automatically by calling the consumer's configured
+ * `translator` module, then compile. The caller has already established that the
+ * catalog has untranslated entries and that `config.translator` is set.
+ */
+async function runAutoTranslate(
+  p: Prompts,
+  config: LinguoConfig,
+  baseDir: string,
+  locale: string,
+  poPath: string,
+  poText: string,
+  count: number,
+): Promise<void> {
+  if (config.translator === undefined) {
+    return; // guarded by the caller; keeps the type narrow
+  }
+  const label = localeLabel(locale);
+  const s = p.spinner();
+  s.start(`Translating ${count} entr${count === 1 ? 'y' : 'ies'} with your translator`);
+
+  try {
+    const translate = await loadTranslator(resolve(baseDir, config.translator));
+    const outcome = await autoTranslateCatalog({
+      translate,
+      poText,
+      targetLocale: locale,
+      targetLabel: label,
+      sourceLocale: config.sourceLocale,
+    });
+    if (outcome.applied === 0) {
+      s.stop('No translations applied');
+      p.log.warn('The translator returned nothing usable — the catalog is unchanged.');
+      return;
+    }
+    writeFileSync(poPath, outcome.po, 'utf8');
+    s.stop(`Applied ${outcome.applied} translation(s)`);
+    runCompile(p, config, baseDir);
+    if (outcome.remaining === 0) {
+      p.log.success(`${label} is fully translated.`);
+    } else {
+      p.log.success(`${label} — ${outcome.remaining} still missing.`);
+    }
+  } catch (error) {
+    s.stop('Translation failed');
+    p.log.error(error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function runTranslate(p: Prompts, config: LinguoConfig, baseDir: string): Promise<void> {
   const locale = await p.select({
     message: 'Which language do you want to translate?',
-    options: config.locales.map((l) => ({ value: l, label: localeLabel(l) })),
+    options: config.locales.map((l) => ({
+      value: l,
+      label: localeLabel(l),
+      hint: localeHint(untranslatedCount(baseDir, config, l)),
+    })),
   });
   if (p.isCancel(locale)) {
     return;
@@ -251,6 +334,26 @@ async function runTranslate(p: Prompts, config: LinguoConfig, baseDir: string): 
   if (untranslated.length === 0) {
     p.log.success(`${localeLabel(locale)} is already fully translated.`);
     return;
+  }
+
+  // When a translator module is configured, let the user pick automatic (call
+  // it directly) over the manual copy-prompt/paste-reply round-trip.
+  if (config.translator !== undefined) {
+    const method = await p.select({
+      message: 'How do you want to translate?',
+      options: [
+        { value: 'auto', label: 'Automatic', hint: `call your translator (${config.translator})` },
+        { value: 'manual', label: 'Manual', hint: 'copy a prompt, paste the reply' },
+      ],
+      initialValue: 'auto',
+    });
+    if (p.isCancel(method)) {
+      return;
+    }
+    if (method === 'auto') {
+      await runAutoTranslate(p, config, baseDir, locale, poPath, poText, untranslated.length);
+      return;
+    }
   }
 
   // Only the untranslated entries go to the model — not the whole catalog.
@@ -315,7 +418,10 @@ function parseLocales(input: string): string[] {
 }
 
 function writeConfigFile(path: string, config: LinguoConfig): void {
-  writeFileSync(path, serializeConfig(config), 'utf8');
+  // Stamp a $schema for editor tooling, preserving one the config already has.
+  const withSchema =
+    config.$schema !== undefined ? config : { ...config, $schema: CONFIG_SCHEMA_REF };
+  writeFileSync(path, serializeConfig(withSchema), 'utf8');
 }
 
 /**
@@ -379,6 +485,14 @@ async function configForm(p: Prompts, current?: LinguoConfig): Promise<LinguoCon
   });
   if (p.isCancel(referenceBase)) return undefined;
 
+  const translator = await p.text({
+    message: 'Translator module for automatic AI translation (optional, blank to skip)',
+    placeholder: './linguo.translator.mjs',
+    initialValue: current?.translator ?? '',
+  });
+  if (p.isCancel(translator)) return undefined;
+  const translatorPath = translator.trim();
+
   return {
     locales,
     sourceLocale,
@@ -386,7 +500,138 @@ async function configForm(p: Prompts, current?: LinguoConfig): Promise<LinguoCon
     catalogs: catalogs.trim() || DEFAULT_CONFIG.catalogs,
     output: output.trim() || DEFAULT_CONFIG.output,
     referenceBase,
+    ...(translatorPath ? { translator: translatorPath } : {}),
   };
+}
+
+/** Edit a single directory value; returns `undefined` if cancelled, the kept
+ * current value if blanked, otherwise the trimmed new value. */
+async function editText(p: Prompts, message: string, current: string): Promise<string | undefined> {
+  const value = await p.text({ message, placeholder: current, initialValue: current });
+  if (p.isCancel(value)) return undefined;
+  return value.trim() || current;
+}
+
+/** A one-line description of every config field, shown when it is selected. */
+const FIELD_HELP: Record<string, string> = {
+  locales: 'The languages you ship. Comma-separated BCP-47 codes, e.g. en, pl, de.',
+  sourceLocale:
+    'The language your source strings are authored in. Its catalog is never flagged as missing.',
+  src: 'Directory scanned for translatable strings (the t pipe/directive and t() calls).',
+  catalogs: 'Where the editable <locale>.po catalogs are kept.',
+  output: 'Where compiled runtime <locale>.json dictionaries are written for the app to load.',
+  referenceBase:
+    'How #: source references are written: relative to the config file (portable) or to the cwd (clickable).',
+  translator:
+    'Path to a module exporting a translate() function for automatic AI translation. Blank uses the clipboard flow.',
+};
+
+/** A copy without the optional translator key (exactOptionalPropertyTypes-safe). */
+function withoutTranslator(config: LinguoConfig): LinguoConfig {
+  return {
+    ...(config.$schema !== undefined ? { $schema: config.$schema } : {}),
+    locales: config.locales,
+    sourceLocale: config.sourceLocale,
+    src: config.src,
+    catalogs: config.catalogs,
+    output: config.output,
+    referenceBase: config.referenceBase,
+  };
+}
+
+/**
+ * BIOS-style settings editor: lists every value with its current setting and
+ * lets you change one at a time, then Save or Discard. Used when editing an
+ * existing config (first-time creation uses the guided {@link configForm}).
+ * Returns the updated config, or `undefined` if discarded.
+ */
+async function editConfigMenu(
+  p: Prompts,
+  current: LinguoConfig,
+): Promise<LinguoConfig | undefined> {
+  let draft: LinguoConfig = { ...current };
+
+  for (;;) {
+    const field = await p.select({
+      message: 'Configuration — choose a value to change',
+      options: [
+        { value: 'locales', label: 'Languages', hint: draft.locales.join(', ') },
+        { value: 'sourceLocale', label: 'Source language', hint: draft.sourceLocale },
+        { value: 'src', label: 'Source directory', hint: draft.src },
+        { value: 'catalogs', label: 'Catalogs directory', hint: draft.catalogs },
+        { value: 'output', label: 'Output directory', hint: draft.output },
+        { value: 'referenceBase', label: 'Reference base', hint: draft.referenceBase },
+        {
+          value: 'translator',
+          label: 'AI translator',
+          hint: draft.translator ?? '(none — clipboard)',
+        },
+        { value: 'save', label: '✓ Save & exit' },
+        { value: 'cancel', label: '✗ Discard changes' },
+      ],
+    });
+    if (p.isCancel(field) || field === 'cancel') return undefined;
+    if (field === 'save') return draft;
+
+    // Every setting gets a description, shown as you drill into it.
+    const help = FIELD_HELP[field];
+    if (help !== undefined) {
+      p.note(help, 'About this setting');
+    }
+
+    if (field === 'locales') {
+      const input = await p.text({
+        message: 'Languages — comma-separated locale codes',
+        placeholder: 'en, pl, de',
+        initialValue: draft.locales.join(', '),
+        validate: (v) =>
+          parseLocales(v ?? '').length === 0 ? 'Enter at least one locale code' : undefined,
+      });
+      if (p.isCancel(input)) continue;
+      const locales = parseLocales(input);
+      // Keep the source language valid against the new list.
+      const sourceLocale = locales.includes(draft.sourceLocale)
+        ? draft.sourceLocale
+        : (locales[0] ?? draft.sourceLocale);
+      draft = { ...draft, locales, sourceLocale };
+    } else if (field === 'sourceLocale') {
+      const value = await p.select({
+        message: 'Source language',
+        options: draft.locales.map((l) => ({ value: l, label: localeLabel(l) })),
+        initialValue: draft.sourceLocale,
+      });
+      if (!p.isCancel(value)) draft = { ...draft, sourceLocale: value };
+    } else if (field === 'referenceBase') {
+      const value = await p.select({
+        message: 'Reference base for .po #: lines',
+        options: [
+          { value: 'config' as const, label: 'config', hint: 'relative to the config file' },
+          { value: 'workspace' as const, label: 'workspace', hint: 'relative to the cwd' },
+        ],
+        initialValue: draft.referenceBase,
+      });
+      if (!p.isCancel(value)) draft = { ...draft, referenceBase: value };
+    } else if (field === 'src') {
+      const value = await editText(p, 'Source directory to scan', draft.src);
+      if (value !== undefined) draft = { ...draft, src: value };
+    } else if (field === 'catalogs') {
+      const value = await editText(p, 'Directory for the .po catalogs', draft.catalogs);
+      if (value !== undefined) draft = { ...draft, catalogs: value };
+    } else if (field === 'translator') {
+      const value = await p.text({
+        message: 'Translator module path (blank to disable automatic translation)',
+        placeholder: './linguo.translator.mjs',
+        initialValue: draft.translator ?? '',
+      });
+      if (!p.isCancel(value)) {
+        const trimmed = value.trim();
+        draft = trimmed ? { ...draft, translator: trimmed } : withoutTranslator(draft);
+      }
+    } else {
+      const value = await editText(p, 'Directory for the compiled JSON', draft.output);
+      if (value !== undefined) draft = { ...draft, output: value };
+    }
+  }
 }
 
 /**
@@ -408,7 +653,8 @@ export async function runInit(): Promise<void> {
     }
   }
 
-  const config = await configForm(p, current);
+  // Existing config → BIOS-style settings editor; fresh → guided wizard.
+  const config = current !== undefined ? await editConfigMenu(p, current) : await configForm(p);
   if (config === undefined) {
     p.cancel('Cancelled — no changes written.');
     return;
@@ -483,7 +729,12 @@ export async function runInteractive(): Promise<void> {
       options: [
         { value: 'extract', label: 'Extract messages', hint: 'scan source → update .po catalogs' },
         { value: 'compile', label: 'Compile catalogs', hint: '.po → runtime .json' },
-        { value: 'translate', label: 'Translate with an LLM', hint: 'copy prompt, paste reply' },
+        {
+          value: 'translate',
+          label: 'Translate with an LLM',
+          hint:
+            config.translator !== undefined ? 'automatic or clipboard' : 'copy prompt, paste reply',
+        },
         { value: 'all', label: 'Run the full pipeline', hint: 'extract, then compile' },
         { value: 'config', label: 'Edit configuration', hint: 'languages, paths, references' },
         { value: 'exit', label: 'Exit' },
@@ -494,7 +745,7 @@ export async function runInteractive(): Promise<void> {
       break;
     }
     if (action === 'config') {
-      const updated = await configForm(p, config);
+      const updated = await editConfigMenu(p, config);
       if (updated !== undefined) {
         writeConfigFile(configPath, updated);
         config = updated;

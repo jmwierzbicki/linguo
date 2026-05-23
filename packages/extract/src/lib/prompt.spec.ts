@@ -15,7 +15,7 @@ describe('buildTranslationPrompt', () => {
     expect(prompt).toContain(po);
   });
 
-  it('keeps the ng-linguo concepts the LLM needs (context, BBCode, MF2)', () => {
+  it('keeps the ng-linguo concepts the LLM needs (context, slot tags, MF2)', () => {
     const prompt = buildTranslationPrompt('Polish (pl)', po);
     expect(prompt).toContain('msgctxt');
     expect(prompt).toContain('[name]...[/name]');
