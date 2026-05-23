@@ -58,3 +58,10 @@ vitest.config.*.timestamp*
 # local catalog backups
 *_backup.po
 *_backup.json
+
+# env files with secrets (keep the committed template)
+.env
+.env.local
+.env.*.local
+!.env.example
+/playground/.env
