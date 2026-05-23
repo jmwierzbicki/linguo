@@ -1,1 +1,1 @@
-export { meta, rules } from './lib/plugin';
+export { meta, rules, configs } from './lib/plugin';
