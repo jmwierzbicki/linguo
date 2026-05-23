@@ -14,6 +14,7 @@
     "build": "nx run-many -t build",
     "affected": "nx affected -t lint test build",
     "changeset": "changeset",
+    "sync:readme": "node tools/sync-readme.mjs",
     "linguo": "nx build extract && node dist/packages/extract/src/cli.js",
     "prepare": "husky"
   },

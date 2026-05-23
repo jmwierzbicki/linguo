@@ -1,6 +1,29 @@
 {
   "name": "@ng-linguo/extract",
-  "version": "0.0.1",
+  "version": "0.9.2",
+  "description": "The ng-linguo extraction CLI — scans Angular source for translatable messages, manages gettext .po catalogs, and compiles them to runtime JSON. Pure Node, zero Angular deps.",
+  "license": "MIT",
+  "author": "jmwierzbicki",
+  "homepage": "https://github.com/jmwierzbicki/linguo/tree/main/packages/extract#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmwierzbicki/linguo.git",
+    "directory": "packages/extract"
+  },
+  "bugs": {
+    "url": "https://github.com/jmwierzbicki/linguo/issues"
+  },
+  "keywords": [
+    "angular",
+    "i18n",
+    "internationalization",
+    "translation",
+    "extract",
+    "gettext",
+    "po",
+    "cli",
+    "ng-linguo"
+  ],
   "type": "commonjs",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",

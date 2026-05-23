@@ -12,18 +12,21 @@ pnpm add -D @ng-linguo/extract
 
 ## Quick start
 
+The package name is `@ng-linguo/extract`; its bin is `linguo-extract`, so run it
+with `npx` (or from an npm script) once it's a dependency:
+
 ```bash
 # Create linguo.config.json (interactive in a terminal, or pass flags for CI)
-linguo-extract init --locales en,pl,de
+npx linguo-extract init --locales en,pl,de
 
 # Scan source → update <locale>.po catalogs
-linguo-extract extract
+npx linguo-extract extract
 
 # Compile <locale>.po → runtime <locale>.json
-linguo-extract compile
+npx linguo-extract compile
 ```
 
-Run `linguo-extract` with no command in a terminal to open the guided menu,
+Run `npx linguo-extract` with no command in a terminal to open the guided menu,
 which can also create and edit your config (a BIOS-style settings screen where
 each value carries a description).
 
@@ -84,7 +87,7 @@ including inside the interactive menu — whether or not you configure a transla
 ### Manual — clipboard (no API key, no config)
 
 ```bash
-linguo-extract copyprompt pl   # copies the prompt to your clipboard
+npx linguo-extract copyprompt pl   # copies the prompt to your clipboard
 ```
 
 Paste it into any chat model, then save the reply over `pl.po`. Or use the
@@ -167,8 +170,8 @@ Then link it and run:
 ```
 
 ```bash
-linguo-extract translate --locale pl   # one language
-linguo-extract translate --all         # every language with missing entries
+npx linguo-extract translate --locale pl   # one language
+npx linguo-extract translate --all         # every language with missing entries
 ```
 
 `translate` only touches entries that are still missing, then compiles. The same
