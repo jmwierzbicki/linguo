@@ -43,23 +43,53 @@ export class App {
   }
 
   // ── Sidebar table of contents ─────────────────────────────────────────────
-  // Labels are wrapped in mark() so the extractor sees the source string even
-  // though the template reads them through a variable ({{ section.label | t }},
-  // which is not statically extractable). 'injectTranslate()' is a bare API name,
-  // so it is left unmarked — there is nothing to translate.
-  protected readonly sections: ReadonlyArray<{ id: string; label: string }> = [
-    { id: 'setup', label: mark('Setup') },
-    { id: 'pipe', label: mark('The t pipe') },
-    { id: 'directive', label: mark('The [t] directive') },
-    { id: 'inject', label: 'injectTranslate()' },
-    { id: 'plurals', label: mark('Plurals') },
-    { id: 'ordinals', label: mark('Ordinals') },
-    { id: 'gender', label: mark('Gender select') },
-    { id: 'numbers', label: mark('Number formatting') },
-    { id: 'context', label: mark('Context (homonyms)') },
-    { id: 'slots', label: mark('Rich text (slots)') },
-    { id: 'eslint', label: mark('ESLint & a11y') },
-    { id: 'translate', label: mark('Translating with AI') },
+  // Sections are organised into four groups so the page reads as a learning
+  // path: start here → the i18n hard parts → advanced messages → tooling.
+  // Group titles and section labels are wrapped in mark() so the extractor sees
+  // the source string even though the template reads them through a variable
+  // ({{ label | t }}, which is not statically extractable). 'injectTranslate()'
+  // is a bare API name, so it is left unmarked — there is nothing to translate.
+  protected readonly sectionGroups: ReadonlyArray<{
+    id: string;
+    title: string;
+    sections: ReadonlyArray<{ id: string; label: string }>;
+  }> = [
+    {
+      id: 'group-start',
+      title: mark('Getting started'),
+      sections: [
+        { id: 'setup', label: mark('Setup') },
+        { id: 'pipe', label: mark('The t pipe') },
+        { id: 'directive', label: mark('The [t] directive') },
+        { id: 'inject', label: 'injectTranslate()' },
+      ],
+    },
+    {
+      id: 'group-plurals',
+      title: mark('Plurals & formatting'),
+      sections: [
+        { id: 'plurals', label: mark('Plurals') },
+        { id: 'ordinals', label: mark('Ordinals') },
+        { id: 'gender', label: mark('Gender select') },
+        { id: 'numbers', label: mark('Number formatting') },
+      ],
+    },
+    {
+      id: 'group-advanced',
+      title: mark('Advanced messages'),
+      sections: [
+        { id: 'context', label: mark('Context (homonyms)') },
+        { id: 'slots', label: mark('Rich text (slots)') },
+      ],
+    },
+    {
+      id: 'group-tooling',
+      title: mark('Tooling & workflow'),
+      sections: [
+        { id: 'eslint', label: mark('ESLint & a11y') },
+        { id: 'translate', label: mark('Translation workflow') },
+      ],
+    },
   ];
 
   protected readonly languages: ReadonlyArray<{ code: string; label: string }> = [
@@ -108,7 +138,7 @@ export class App {
   /** Number grouping is locale-driven: 1,234,567 / 1.234.567 / 1 234 567. */
   protected readonly msgPopulation = mark('This city has {$n :number} residents');
 
-  /** Simple placeholder whose position moves to clause-final in German. */
+  /** A plain placeholder; in German the {$file} part moves toward the end of the sentence. */
   protected readonly msgDownload = mark('Click the button to download {$file}');
 
   protected readonly greeting = mark('Hello {$name}!');
@@ -125,6 +155,15 @@ export class App {
   // extractor from scanning them — without it they become junk catalog entries.
   // linguo-ignore-start
   protected readonly setupTabs: CodeTab[] = [
+    {
+      label: 'Install',
+      lang: 'bash',
+      code: `# the runtime + its peer dependency
+npm i @ng-linguo/linguo @ngrx/signals
+
+# the build-time CLI (extract/translate/compile)
+npm i -D @ng-linguo/extract`,
+    },
     {
       label: 'app.config.ts',
       lang: 'typescript',
@@ -144,6 +183,33 @@ export const appConfig: ApplicationConfig = {
     provideIcu({ defaultFormat: 'mf2' }),
   ],
 };`,
+    },
+    {
+      label: 'All options',
+      lang: 'typescript',
+      code: `// Every provideTranslate() option, with its default. Only the first two
+// are required — the rest are runtime conveniences you can leave out.
+provideTranslate({
+  // ── Required ──────────────────────────────────────────────────────────
+  defaultLang: 'en',                  // reported before load; guaranteed fallback
+  loader: () => createHttpLoader(),   // how dictionaries load (object or DI factory)
+
+  // ── Optional (defaults shown) ─────────────────────────────────────────
+  supportedLangs: ['en', 'pl', 'de'], // default: none. Matches a saved/browser
+                                      // language to one you ship; required for
+                                      // browser detection to do anything.
+  detectBrowserLanguage: true,        // first run: match navigator.languages
+                                      // against supportedLangs. SSR-safe.
+  persistSelectedLanguage: true,      // save the active language to localStorage
+                                      // whenever it changes. SSR-safe.
+  restoreSelectedLanguage: true,      // default: = persistSelectedLanguage. Read
+                                      // it back on startup, inside restoreLang().
+  persistKey: 'ng-linguo.lang',       // the localStorage key used for the above.
+});
+
+// Note: supportedLangs is the RUNTIME locale list (browser/saved matching).
+// The build-time CLI keeps its own list in linguo.config.json — see the
+// Translation workflow section. The runtime never reads that file.`,
     },
     {
       label: 'app.ts',
@@ -168,7 +234,7 @@ export const appConfig: ApplicationConfig = {
       label: 'public/i18n/en.json',
       lang: 'json',
       code: `{
-  "He was driving incredibly fast!": "He was driving incredibly fast!",
+  "Welcome back!": "Welcome back!",
   "Hello {$name}!": "Hello {$name}!"
 }`,
     },
@@ -179,7 +245,7 @@ export const appConfig: ApplicationConfig = {
       label: 'Template',
       lang: 'html',
       code: `<!-- The source string is the key; translators edit the value. -->
-<p>{{ 'He was driving incredibly fast!' | t }}</p>`,
+<p>{{ 'Welcome back!' | t }}</p>`,
     },
     {
       label: 'In a binding',
@@ -203,10 +269,10 @@ export const appConfig: ApplicationConfig = {
       label: 'JSON',
       lang: 'json',
       code: `// en.json
-{ "He was driving incredibly fast!": "He was driving incredibly fast!" }
+{ "Welcome back!": "Welcome back!" }
 
 // pl.json
-{ "He was driving incredibly fast!": "Jechał niesamowicie szybko!" }`,
+{ "Welcome back!": "Witaj ponownie!" }`,
     },
   ];
 
@@ -216,7 +282,7 @@ export const appConfig: ApplicationConfig = {
       lang: 'html',
       code: `<!-- The [t] directive renders into the element's text content. Use it
      when the translation needs an element to live in (and for slot tags). -->
-<p t="He was driving incredibly fast!"></p>`,
+<p t="Welcome back!"></p>`,
     },
   ];
 
@@ -491,6 +557,52 @@ linguo-extract compile
 
 # Or just run the guided menu (it offers both manual and automatic):
 linguo-extract`,
+    },
+    {
+      label: 'Interactive menu',
+      lang: 'bash',
+      code: `# Run with no command to open the guided menu (great for first-timers).
+# It walks through every step and includes a BIOS-style settings editor
+# where each config field carries an inline description.
+linguo-extract
+
+#   ┌ ng-linguo ───────────────────────────────┐
+#   │ › Extract messages                        │
+#   │   Compile catalogs                        │
+#   │   Translate with an LLM   (manual / auto) │
+#   │   Run the full pipeline                   │
+#   │   Edit configuration                      │
+#   │   Exit                                    │
+#   └───────────────────────────────────────────┘`,
+    },
+    {
+      label: 'Add a language',
+      lang: 'bash',
+      code: `# A new locale is a couple of commands (or a couple of clicks in the menu).
+
+# 1. Add its code to the config — e.g. add "fr"
+linguo-extract init --locales en,pl,de,fr
+
+# 2. Seed the new catalog from your source strings
+linguo-extract extract              # creates i18n/fr.po (entries marked missing)
+
+# 3. Fill it in automatically…
+linguo-extract translate --locale fr
+#    …or by hand, with any chat model:
+linguo-extract copyprompt fr        # paste the reply over fr.po
+
+# 4. Compile → public/i18n/fr.json
+linguo-extract compile`,
+    },
+    {
+      label: 'CI',
+      lang: 'bash',
+      code: `# Every command is non-interactive and deterministic, so it drops into CI.
+# Pass --config when the file isn't auto-discoverable from the working dir.
+
+linguo-extract extract --config linguo.config.json   # fails the build on error
+linguo-extract translate --all                        # optional; needs a translator
+linguo-extract compile                                # → the JSON the app ships`,
     },
     {
       label: 'linguo.config.json',
