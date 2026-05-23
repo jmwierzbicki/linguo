@@ -164,3 +164,19 @@ export function parseConfig(raw: string): LinguoConfig {
     referenceBase: referenceBase === 'workspace' ? 'workspace' : DEFAULT_CONFIG.referenceBase,
   };
 }
+
+/**
+ * Serialize a {@link LinguoConfig} to pretty-printed `linguo.config.json` text
+ * (stable field order, trailing newline). Round-trips with {@link parseConfig}.
+ */
+export function serializeConfig(config: LinguoConfig): string {
+  const ordered = {
+    locales: config.locales,
+    sourceLocale: config.sourceLocale,
+    src: config.src,
+    catalogs: config.catalogs,
+    output: config.output,
+    referenceBase: config.referenceBase,
+  };
+  return `${JSON.stringify(ordered, null, 2)}\n`;
+}

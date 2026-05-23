@@ -3,7 +3,13 @@ import { basename, dirname, resolve } from 'node:path';
 
 import { applyTranslations, isUntranslated } from './lib/apply';
 import { copyToClipboard, readClipboard } from './lib/clipboard';
-import { findConfigFile, parseConfig, type LinguoConfig } from './lib/config';
+import {
+  DEFAULT_CONFIG,
+  findConfigFile,
+  parseConfig,
+  serializeConfig,
+  type LinguoConfig,
+} from './lib/config';
 import { parsePo, serializePo } from './lib/po';
 import { buildTranslationPrompt, localeLabel } from './lib/prompt';
 import { compileCatalogs, extractToCatalogs, type ExtractStats } from './lib/runner';
@@ -299,6 +305,120 @@ async function runTranslate(p: Prompts, config: LinguoConfig, baseDir: string): 
   }
 }
 
+// ── Configuration ───────────────────────────────────────────────────────────
+
+function parseLocales(input: string): string[] {
+  return input
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function writeConfigFile(path: string, config: LinguoConfig): void {
+  writeFileSync(path, serializeConfig(config), 'utf8');
+}
+
+/**
+ * Interactive form to create or edit a {@link LinguoConfig}. Pre-fills from
+ * `current` when editing. Returns `undefined` if the user cancels.
+ */
+async function configForm(p: Prompts, current?: LinguoConfig): Promise<LinguoConfig | undefined> {
+  const localesInput = await p.text({
+    message: 'Languages — comma-separated locale codes',
+    placeholder: 'en, pl, de',
+    initialValue: current?.locales.join(', ') ?? '',
+    validate: (value) =>
+      parseLocales(value ?? '').length === 0 ? 'Enter at least one locale code' : undefined,
+  });
+  if (p.isCancel(localesInput)) return undefined;
+  const locales = parseLocales(localesInput);
+
+  const defaultSource = locales[0] ?? DEFAULT_CONFIG.sourceLocale;
+  const sourceLocale = await p.select({
+    message: 'Source language (the one your source strings are written in)',
+    options: locales.map((l) => ({ value: l, label: localeLabel(l) })),
+    initialValue:
+      current?.sourceLocale !== undefined && locales.includes(current.sourceLocale)
+        ? current.sourceLocale
+        : defaultSource,
+  });
+  if (p.isCancel(sourceLocale)) return undefined;
+
+  const src = await p.text({
+    message: 'Source directory to scan for messages',
+    placeholder: DEFAULT_CONFIG.src,
+    initialValue: current?.src ?? DEFAULT_CONFIG.src,
+  });
+  if (p.isCancel(src)) return undefined;
+
+  const catalogs = await p.text({
+    message: 'Directory for the .po translation catalogs',
+    placeholder: DEFAULT_CONFIG.catalogs,
+    initialValue: current?.catalogs ?? DEFAULT_CONFIG.catalogs,
+  });
+  if (p.isCancel(catalogs)) return undefined;
+
+  const output = await p.text({
+    message: 'Directory for the compiled runtime JSON',
+    placeholder: DEFAULT_CONFIG.output,
+    initialValue: current?.output ?? DEFAULT_CONFIG.output,
+  });
+  if (p.isCancel(output)) return undefined;
+
+  const referenceBase = await p.select({
+    message: 'How should .po source references (#:) be written?',
+    options: [
+      { value: 'config' as const, label: 'config', hint: 'relative to the config file — portable' },
+      {
+        value: 'workspace' as const,
+        label: 'workspace',
+        hint: 'relative to the cwd — clickable in the terminal',
+      },
+    ],
+    initialValue: current?.referenceBase ?? DEFAULT_CONFIG.referenceBase,
+  });
+  if (p.isCancel(referenceBase)) return undefined;
+
+  return {
+    locales,
+    sourceLocale,
+    src: src.trim() || DEFAULT_CONFIG.src,
+    catalogs: catalogs.trim() || DEFAULT_CONFIG.catalogs,
+    output: output.trim() || DEFAULT_CONFIG.output,
+    referenceBase,
+  };
+}
+
+/**
+ * Run the standalone config wizard (the `init` command on a TTY): edit an
+ * existing `linguo.config.json`, or create one in the current directory.
+ */
+export async function runInit(): Promise<void> {
+  const p = await import('@clack/prompts');
+  p.intro('ng-linguo · configuration');
+
+  const existing = findConfigFile(process.cwd());
+  let current: LinguoConfig | undefined;
+  if (existing !== undefined) {
+    try {
+      current = parseConfig(readFileSync(existing, 'utf8'));
+      p.log.info(`Editing ${existing}`);
+    } catch (error) {
+      p.log.warn(`Existing config is invalid (${String(error)}); starting fresh.`);
+    }
+  }
+
+  const config = await configForm(p, current);
+  if (config === undefined) {
+    p.cancel('Cancelled — no changes written.');
+    return;
+  }
+
+  const path = existing ?? resolve(process.cwd(), 'linguo.config.json');
+  writeConfigFile(path, config);
+  p.outro(`${existing !== undefined ? 'Updated' : 'Created'} ${path}`);
+}
+
 // ── Menu ───────────────────────────────────────────────────────────────────
 
 /**
@@ -310,7 +430,7 @@ async function runTranslate(p: Prompts, config: LinguoConfig, baseDir: string): 
 export async function runInteractive(): Promise<void> {
   const p = await import('@clack/prompts');
 
-  const configPath = findConfigFile(process.cwd());
+  let configPath = findConfigFile(process.cwd());
   let config: LinguoConfig | undefined;
   let configError: string | undefined;
   if (configPath !== undefined) {
@@ -324,12 +444,34 @@ export async function runInteractive(): Promise<void> {
   printBanner(config?.locales ?? []);
   p.intro('ng-linguo');
 
-  if (configPath === undefined) {
-    p.cancel('No linguo.config.json found. Create one, or run a command with --config.');
+  if (configError !== undefined) {
+    p.cancel(configError);
     return;
   }
-  if (configError !== undefined || config === undefined) {
-    p.cancel(configError ?? 'Could not read the configuration.');
+
+  // No config yet — offer to create one rather than dead-ending.
+  if (config === undefined) {
+    const create = await p.confirm({
+      message: 'No linguo.config.json found here. Create one now?',
+      initialValue: true,
+    });
+    if (p.isCancel(create) || !create) {
+      p.outro('Nothing to do — add a linguo.config.json to get started.');
+      return;
+    }
+    const created = await configForm(p);
+    if (created === undefined) {
+      p.cancel('Cancelled.');
+      return;
+    }
+    configPath = resolve(process.cwd(), 'linguo.config.json');
+    writeConfigFile(configPath, created);
+    config = created;
+    p.log.success(`Created ${configPath}`);
+  }
+
+  if (configPath === undefined) {
+    p.cancel('Could not load configuration.'); // unreachable; satisfies the type narrowing
     return;
   }
   const baseDir = dirname(configPath);
@@ -343,12 +485,22 @@ export async function runInteractive(): Promise<void> {
         { value: 'compile', label: 'Compile catalogs', hint: '.po → runtime .json' },
         { value: 'translate', label: 'Translate with an LLM', hint: 'copy prompt, paste reply' },
         { value: 'all', label: 'Run the full pipeline', hint: 'extract, then compile' },
+        { value: 'config', label: 'Edit configuration', hint: 'languages, paths, references' },
         { value: 'exit', label: 'Exit' },
       ],
     });
 
     if (p.isCancel(action) || action === 'exit') {
       break;
+    }
+    if (action === 'config') {
+      const updated = await configForm(p, config);
+      if (updated !== undefined) {
+        writeConfigFile(configPath, updated);
+        config = updated;
+        p.log.success(`Saved ${configPath}`);
+      }
+      continue;
     }
     if (action === 'extract' || action === 'all') {
       runExtract(p, config, baseDir);
