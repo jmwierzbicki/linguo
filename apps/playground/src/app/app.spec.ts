@@ -19,17 +19,18 @@ describe('App', () => {
     }).compileComponents();
   });
 
-  it('renders the playground heading', async () => {
+  it('renders the hero heading', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('ng-linguo playground');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Angular i18n');
   });
 
-  it('reports the configured default language', async () => {
+  it('marks the configured default language as active in the switcher', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('Current language: en');
+    const active = compiled.querySelector('button.bg-indigo-500');
+    expect(active?.textContent).toContain('English');
   });
 });

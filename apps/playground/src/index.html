@@ -1,13 +1,40 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark scroll-smooth">
   <head>
     <meta charset="utf-8" />
-    <title>playground</title>
+    <title>ng-linguo — Angular i18n on SignalStore</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="ng-linguo — a modern, complete i18n solution for Angular built on SignalStore."
+    />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
+
+    <!-- Playground-only deps loaded from CDNs (this app is never published, so
+         the repo's runtime-dependency rules don't apply here). Tailwind Play CDN
+         gives us utility classes without a build step; highlight.js colours the
+         code samples. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   </head>
-  <body>
+  <body class="bg-slate-950 text-slate-200 antialiased">
     <app-root></app-root>
   </body>
 </html>

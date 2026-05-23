@@ -1,8 +1,10 @@
 {
-  "locales": ["en", "pl", "de"],
+  "$schema": "../../packages/extract/schema/linguo.config.schema.json",
+  "locales": ["en", "pl", "de", "fr", "ja"],
   "sourceLocale": "en",
   "src": "src",
   "catalogs": "i18n",
   "output": "public/i18n",
-  "referenceBase": "workspace"
+  "referenceBase": "workspace",
+  "translator": "./linguo.translator.mjs"
 }
