@@ -6,4 +6,8 @@ describe('mark', () => {
       '{count, plural, one {# file} other {# files}}',
     );
   });
+
+  it('returns the message unchanged when given context options (a runtime no-op)', () => {
+    expect(mark('{$count} files', { context: 'file = a document' })).toBe('{$count} files');
+  });
 });
