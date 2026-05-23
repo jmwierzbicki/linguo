@@ -93,16 +93,34 @@ zero RxJS plumbing in your components.
 
 ## Install
 
+ng-linguo is two packages that do two different jobs at two different times — so
+you install both, once.
+
+**The runtime** — what your app imports and ships to the browser:
+
 ```bash
 npm i @ng-linguo/linguo @ngrx/signals
 ```
 
 Requires **Angular 18+**. `@ngrx/signals` is a peer dependency — bring your own.
 
+**The CLI** (`@ng-linguo/extract`) — the build-time tool that scans your source
+and produces the translation files the runtime loads. It's pure Node with zero
+Angular dependencies, so it installs as a dev dependency and never reaches the
+browser:
+
+```bash
+npm i -D @ng-linguo/extract
+```
+
+Its bin is `linguo-extract`; you run it with `npx linguo-extract …` (or from an
+npm script). Neither package depends on the other, so each stays minimal — the
+runtime renders translations in your app, the CLI generates them in your build.
+
 ## Getting started
 
 The fastest path from an empty Angular app to a translated one. Steps 1–3 get
-the runtime working; step 4 generates the real translation files.
+the runtime working; step 4 uses the CLI to generate the real translation files.
 
 ### 1. Configure the runtime
 
