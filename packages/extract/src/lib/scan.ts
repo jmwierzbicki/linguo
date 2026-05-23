@@ -19,20 +19,22 @@ export interface ExtractedMessage {
 
 // The `t` pipe: `'Play' | t` with an optional options object (`| t: { ... }`).
 // Group 2 is the key; group 3 is the options object (one level of nesting), from
-// which the context is read.
+// which the context is read. The key body uses `[\s\S]` rather than `.` so a
+// string literal that a formatter wrapped across several lines is still captured
+// whole — normalizeMessage collapses the embedded newlines, matching the runtime.
 const PIPE_PATTERN =
-  /(['"])((?:\\.|(?!\1).)*?)\1\s*\|\s*t\b(?:\s*:\s*(\{(?:[^{}]|\{[^{}]*\})*\}))?/g;
+  /(['"])((?:\\.|(?!\1)[\s\S])*?)\1\s*\|\s*t\b(?:\s*:\s*(\{(?:[^{}]|\{[^{}]*\})*\}))?/g;
 // `mark('...')` — the extraction marker for messages defined outside a template
 // (e.g. a component field). Not preceded by `.` so `foo.mark(...)` is ignored.
 // Group 2 is the key; group 3 is the optional options object (`mark('…', { … })`,
 // one level of nesting), from which the context is read.
 const MARK_PATTERN =
-  /(?<!\.)\bmark\s*\(\s*(['"])((?:\\.|(?!\1).)*?)\1(?:\s*,\s*(\{(?:[^{}]|\{[^{}]*\})*\}))?/g;
+  /(?<!\.)\bmark\s*\(\s*(['"])((?:\\.|(?!\1)[\s\S])*?)\1(?:\s*,\s*(\{(?:[^{}]|\{[^{}]*\})*\}))?/g;
 // The `t('...', { ... })` helper call (from `injectTranslate()`). The lookbehind
 // keeps it from matching `obj.t(`, `$t(`, or the tail of an identifier. Group 2
 // is the key; group 3 is the options object, from which the context is read.
 const T_CALL_PATTERN =
-  /(?<![\w.$])t\s*\(\s*(['"])((?:\\.|(?!\1).)*?)\1(?:\s*,\s*(\{(?:[^{}]|\{[^{}]*\})*\}))?/g;
+  /(?<![\w.$])t\s*\(\s*(['"])((?:\\.|(?!\1)[\s\S])*?)\1(?:\s*,\s*(\{(?:[^{}]|\{[^{}]*\})*\}))?/g;
 // An element carrying the `[t]` directive via a static `t="message"` attribute.
 // `(?<![\w-])t\s*=` matches a standalone `t=` attribute (not `alt`, `data-t`,
 // `tParams`, `tContext`, `tFor`, nor bound `[t]="…"`). Group 2 is the message.
@@ -40,7 +42,7 @@ const DIRECTIVE_TAG_PATTERN = /<[a-zA-Z][\w-]*\b[^>]*?(?<![\w-])t\s*=\s*"(?:\\.|
 const DIRECTIVE_MESSAGE_PATTERN = /(?<![\w-])t\s*=\s*"((?:\\.|[^"])*)"/;
 const DIRECTIVE_CONTEXT_PATTERN = /(?<![\w-])tContext\s*=\s*"((?:\\.|[^"])*)"/;
 // Reads `context: '…'` out of a pipe options object.
-const CONTEXT_IN_OPTIONS = /\bcontext\s*:\s*(['"])((?:\\.|(?!\1).)*?)\1/;
+const CONTEXT_IN_OPTIONS = /\bcontext\s*:\s*(['"])((?:\\.|(?!\1)[\s\S])*?)\1/;
 
 // Joins context and key for the dedup map (gettext EOT glue).
 const GLUE = String.fromCharCode(4);
