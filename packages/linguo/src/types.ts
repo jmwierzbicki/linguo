@@ -52,10 +52,23 @@ export interface TranslateConfig {
    */
   readonly supportedLangs?: readonly string[];
   /**
-   * Persist the active language to `localStorage` and restore it on startup.
-   * Defaults to `true`. SSR-safe (a no-op when not running in a browser).
+   * Write the active language to `localStorage` whenever it changes (the
+   * **persist** side). Defaults to `true`. SSR-safe (a no-op when not running
+   * in a browser). To stop reading the saved value on startup as well, see
+   * {@link restoreSelectedLanguage}.
    */
   readonly persistSelectedLanguage?: boolean;
+  /**
+   * Read the persisted language back on startup, inside
+   * {@link TranslateStore.restoreLang} (the **restore** side). Decoupled from
+   * {@link persistSelectedLanguage} so an app can keep persisting while owning
+   * the restore decision itself — set this to `false` and run your own
+   * selection logic, or just call `setLang(...)` instead of `restoreLang()`.
+   *
+   * Defaults to `persistSelectedLanguage` (so disabling persistence alone still
+   * disables restore, as before); set it explicitly to override. SSR-safe.
+   */
+  readonly restoreSelectedLanguage?: boolean;
   /** `localStorage` key for the persisted language. Defaults to `ng-linguo.lang`. */
   readonly persistKey?: string;
   /**

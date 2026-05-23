@@ -138,6 +138,44 @@ export const DEFAULT_CONFIG: Omit<LinguoConfig, 'locales' | '$schema'> = {
   referenceBase: 'config',
 };
 
+/**
+ * Field values for {@link buildInitConfig}, mirroring every editable
+ * {@link LinguoConfig} field. Optional fields fall back to {@link DEFAULT_CONFIG}
+ * (or, for `translator`, are omitted) — so the CLI can pass raw flag values
+ * (which are `undefined` when the flag is absent) straight through.
+ */
+export interface InitConfigOptions {
+  /** Languages to generate catalogs for. Required and non-empty. */
+  readonly locales: readonly string[];
+  readonly sourceLocale?: string | undefined;
+  readonly src?: string | undefined;
+  readonly catalogs?: string | undefined;
+  readonly output?: string | undefined;
+  readonly referenceBase?: 'config' | 'workspace' | undefined;
+  readonly translator?: string | undefined;
+}
+
+/**
+ * Build a fresh {@link LinguoConfig} for the `init` command from explicit option
+ * values, applying {@link DEFAULT_CONFIG} for any omitted field and stamping the
+ * `$schema` reference. A blank/absent `translator` is omitted entirely (its
+ * absence means "use the clipboard flow"), keeping the result round-trippable
+ * through {@link serializeConfig}/{@link parseConfig}.
+ */
+export function buildInitConfig(options: InitConfigOptions): LinguoConfig {
+  const translator = options.translator?.trim();
+  return {
+    $schema: CONFIG_SCHEMA_REF,
+    locales: options.locales,
+    sourceLocale: options.sourceLocale ?? DEFAULT_CONFIG.sourceLocale,
+    src: options.src ?? DEFAULT_CONFIG.src,
+    catalogs: options.catalogs ?? DEFAULT_CONFIG.catalogs,
+    output: options.output ?? DEFAULT_CONFIG.output,
+    referenceBase: options.referenceBase ?? DEFAULT_CONFIG.referenceBase,
+    ...(translator ? { translator } : {}),
+  };
+}
+
 function asString(value: unknown, fallback: string): string {
   return typeof value === 'string' && value.length > 0 ? value : fallback;
 }

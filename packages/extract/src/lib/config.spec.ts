@@ -3,7 +3,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import {
+  buildInitConfig,
   CONFIG_FILENAME,
+  CONFIG_SCHEMA_REF,
   DEFAULT_CONFIG,
   findConfigFile,
   parseConfig,
@@ -128,6 +130,63 @@ describe('serializeConfig', () => {
     const text = serializeConfig(withSchema);
     expect(text.indexOf('"$schema"')).toBeLessThan(text.indexOf('"locales"'));
     expect(parseConfig(text)).toEqual(withSchema);
+  });
+});
+
+describe('buildInitConfig', () => {
+  it('applies defaults and the schema reference for omitted fields', () => {
+    expect(buildInitConfig({ locales: ['en', 'pl'] })).toEqual({
+      $schema: CONFIG_SCHEMA_REF,
+      locales: ['en', 'pl'],
+      sourceLocale: DEFAULT_CONFIG.sourceLocale,
+      src: DEFAULT_CONFIG.src,
+      catalogs: DEFAULT_CONFIG.catalogs,
+      output: DEFAULT_CONFIG.output,
+      referenceBase: DEFAULT_CONFIG.referenceBase,
+    });
+  });
+
+  it('carries every provided field, including the translator', () => {
+    expect(
+      buildInitConfig({
+        locales: ['en', 'de'],
+        sourceLocale: 'de',
+        src: 'app',
+        catalogs: 'locales',
+        output: 'public/i18n',
+        referenceBase: 'workspace',
+        translator: './t.mjs',
+      }),
+    ).toEqual({
+      $schema: CONFIG_SCHEMA_REF,
+      locales: ['en', 'de'],
+      sourceLocale: 'de',
+      src: 'app',
+      catalogs: 'locales',
+      output: 'public/i18n',
+      referenceBase: 'workspace',
+      translator: './t.mjs',
+    });
+  });
+
+  it('omits a blank or whitespace-only translator (clipboard flow)', () => {
+    expect(buildInitConfig({ locales: ['en'], translator: '   ' })).not.toHaveProperty(
+      'translator',
+    );
+    expect(buildInitConfig({ locales: ['en'], translator: undefined })).not.toHaveProperty(
+      'translator',
+    );
+  });
+
+  it('trims a provided translator path', () => {
+    expect(buildInitConfig({ locales: ['en'], translator: '  ./t.mjs  ' }).translator).toBe(
+      './t.mjs',
+    );
+  });
+
+  it('round-trips through serializeConfig/parseConfig with the translator intact', () => {
+    const config = buildInitConfig({ locales: ['en', 'pl'], translator: './t.mjs' });
+    expect(parseConfig(serializeConfig(config)).translator).toBe('./t.mjs');
   });
 });
 
