@@ -3,7 +3,7 @@
  */
 export const meta = {
   name: '@ng-linguo/eslint-plugin',
-  version: '0.9.2',
+  version: '0.9.3',
 } as const;
 
 /**
