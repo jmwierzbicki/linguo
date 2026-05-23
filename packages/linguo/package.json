@@ -1,6 +1,6 @@
 {
   "name": "@ng-linguo/linguo",
-  "version": "0.9.2",
+  "version": "0.9.5",
   "description": "A modern, signal-first i18n runtime for Angular 18+ — built on SignalStore, with a translator-safe slot syntax, ICU, and tree-shakeable HTTP loading.",
   "license": "MIT",
   "author": "jmwierzbicki",

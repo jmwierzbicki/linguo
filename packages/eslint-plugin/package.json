@@ -1,6 +1,6 @@
 {
   "name": "@ng-linguo/eslint-plugin",
-  "version": "0.9.2",
+  "version": "0.9.5",
   "description": "ESLint flat-config presets for ng-linguo consumers — teaches Angular template rules about the [t] directive so translator-safe markup lints clean.",
   "license": "MIT",
   "author": "jmwierzbicki",

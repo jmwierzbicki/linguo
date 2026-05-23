@@ -8,6 +8,32 @@ describe('extractMessages', () => {
     expect(result).toEqual([{ keyId: 'Play', context: '', references: ['a.html:1'] }]);
   });
 
+  it('captures a t pipe string a formatter wrapped across several lines', () => {
+    // Prettier wraps long interpolations, so the string literal spans physical
+    // lines and the options object trails onto the next ones. The runtime
+    // collapses the embedded whitespace into single spaces; the extractor must
+    // capture the whole literal and normalize it identically (CLAUDE.md §5.2).
+    const result = extractMessages([
+      {
+        path: 'a.html',
+        content:
+          `<p>{{ 'Heads up: the t pipe is impure, so Angular re-checks it\n` +
+          `      on every pass.' | t : {\n` +
+          `      context: 'Note under the\n` +
+          `      pipe example' } }}</p>`,
+      },
+    ]);
+    // Both the key and the context are collapsed: Angular collapses interpolation
+    // whitespace at runtime, so the catalog must store the single-spaced form.
+    expect(result).toEqual([
+      {
+        keyId: 'Heads up: the t pipe is impure, so Angular re-checks it on every pass.',
+        context: 'Note under the pipe example',
+        references: ['a.html:1'],
+      },
+    ]);
+  });
+
   it('extracts the message from a t directive attribute (ICU and slot tags are safe there)', () => {
     const result = extractMessages([
       { path: 'a.html', content: `<p t="Hello [b]world[/b] {$name}!"></p>` },

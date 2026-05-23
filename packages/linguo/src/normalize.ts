@@ -33,7 +33,13 @@ const CONTEXT_GLUE = String.fromCharCode(4);
  */
 export function contextKey(key: string, context?: string): string {
   const normalizedKey = normalizeKey(key);
-  const normalizedContext = context?.trim() ?? '';
+  // Normalize the context exactly like the key (trim + collapse whitespace).
+  // Angular collapses whitespace inside an interpolation before the pipe runs,
+  // so a multi-line `context: '…'` reaches here already single-spaced; the
+  // extractor must collapse it the same way or the contextual key won't match
+  // (the §5.2 parity contract — and it must also hold for the directive's
+  // tContext, whose whitespace Angular does NOT collapse).
+  const normalizedContext = normalizeKey(context ?? '');
   return normalizedContext === ''
     ? normalizedKey
     : `${normalizedContext}${CONTEXT_GLUE}${normalizedKey}`;

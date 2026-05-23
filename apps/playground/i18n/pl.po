@@ -135,6 +135,11 @@ msgstr "Wpisz angielski tekst bezpośrednio do swojego szablonu — ten tekst je
 msgid "Welcome back!"
 msgstr "Witaj ponownie!"
 
+#: apps/playground/src/app/app.html:231
+msgctxt "Note under the pipe example. 'impure' is the Angular pipe term (a pure pipe only re-runs when its input reference changes); 'change-detection pass' is Angular's render cycle; 'memoizes' = caches the last result; keep the API names [t] and injectTranslate() verbatim"
+msgid "Heads up: the t pipe is impure, so Angular re-checks it on every change-detection pass (it memoizes to stay fast). For long lists or frequently-updated bindings, prefer the [t] directive or injectTranslate() below — both do no work per pass."
+msgstr "Uwaga: pipe t jest nieczysta, więc Angular sprawdza ją ponownie przy każdym przebiegu detekcji zmian (buforuje wyniki, aby zachować szybkość). W przypadku długich list lub często aktualizowanych powiązań, preferuj dyrektywę [t] lub injectTranslate() poniżej — obie nie wykonują pracy przy każdym przebiegu."
+
 #: apps/playground/src/app/app.html:243
 msgctxt "Section heading. 'directive' is the Angular directive concept — keep the technical term; [code] wraps the code symbol '[t]'"
 msgid "The [code][[t][/code] directive"
