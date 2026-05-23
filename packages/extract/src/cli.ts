@@ -4,7 +4,7 @@ import { dirname, resolve } from 'node:path';
 
 import { copyToClipboard } from './lib/clipboard';
 import {
-  CONFIG_SCHEMA_REF,
+  buildInitConfig,
   DEFAULT_CONFIG,
   findConfigFile,
   parseConfig,
@@ -296,15 +296,15 @@ async function main(argv: readonly string[]): Promise<void> {
       throw new Error('init: --locales must list at least one locale code.');
     }
     const refFlag = flag(rest, 'reference-base');
-    const config: LinguoConfig = {
-      $schema: CONFIG_SCHEMA_REF,
+    const config = buildInitConfig({
       locales,
-      sourceLocale: flag(rest, 'source-locale') ?? DEFAULT_CONFIG.sourceLocale,
-      src: flag(rest, 'src') ?? DEFAULT_CONFIG.src,
-      catalogs: flag(rest, 'catalogs') ?? DEFAULT_CONFIG.catalogs,
-      output: flag(rest, 'out') ?? DEFAULT_CONFIG.output,
-      referenceBase: refFlag === 'workspace' ? 'workspace' : DEFAULT_CONFIG.referenceBase,
-    };
+      sourceLocale: flag(rest, 'source-locale'),
+      src: flag(rest, 'src'),
+      catalogs: flag(rest, 'catalogs'),
+      output: flag(rest, 'out'),
+      referenceBase: refFlag === 'workspace' ? 'workspace' : 'config',
+      translator: flag(rest, 'translator'),
+    });
     const target = resolve(process.cwd(), flag(rest, 'config') ?? 'linguo.config.json');
     const existed = existsSync(target);
     if (existed && !hasFlag(rest, 'force')) {
@@ -324,7 +324,7 @@ async function main(argv: readonly string[]): Promise<void> {
       'Reads linguo.config.json (found automatically, or --config <path>); flags override.',
       '',
       '  init    [--locales en,pl] [--source-locale en] [--src <dir>] [--catalogs <dir>]',
-      '          [--out <dir>] [--reference-base config|workspace] [--force]',
+      '          [--out <dir>] [--reference-base config|workspace] [--translator <module>] [--force]',
       '          Create (or, in a terminal, create/edit) linguo.config.json.',
       '',
       '  extract [--config <path>] [--src <dir>] [--out <dir>] [--locales en,pl] [--source-locale en]',

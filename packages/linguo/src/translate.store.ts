@@ -64,11 +64,15 @@ export const TranslateStore = signalStore(
     // localStorage/navigator access below is automatically a no-op on the server.
     const win = inject(DOCUMENT).defaultView;
     const persistEnabled = config.persistSelectedLanguage ?? true;
+    // Restore (read on startup) defaults to the persist setting, so disabling
+    // persistence alone still disables restore (the pre-decoupling behavior);
+    // set restoreSelectedLanguage explicitly to control the two independently.
+    const restoreEnabled = config.restoreSelectedLanguage ?? persistEnabled;
     const detectEnabled = config.detectBrowserLanguage ?? true;
     const persistKey = config.persistKey ?? 'ng-linguo.lang';
 
     function readPersisted(): string | null {
-      if (!persistEnabled || !win) return null;
+      if (!restoreEnabled || !win) return null;
       try {
         return win.localStorage.getItem(persistKey);
       } catch {

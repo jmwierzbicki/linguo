@@ -149,6 +149,52 @@ describe('TranslateStore — language persistence & restoreLang', () => {
     expect(store.isReady()).toBe(true);
   });
 
+  it('still writes but does not restore when restoreSelectedLanguage is false', async () => {
+    localStorage.setItem(KEY, 'de');
+    const store = configure({
+      defaultLang: 'en',
+      supportedLangs: ['en', 'pl', 'de'],
+      restoreSelectedLanguage: false,
+      detectBrowserLanguage: false,
+      loader: noop,
+    });
+    await store.restoreLang();
+    // The persisted 'de' is ignored; falls through to the default.
+    expect(store.currentLang()).toBe('en');
+    // Persistence (the write side) is untouched.
+    await store.setLang('pl');
+    expect(localStorage.getItem(KEY)).toBe('pl');
+  });
+
+  it('restores even with persistence off when restoreSelectedLanguage is true', async () => {
+    localStorage.setItem(KEY, 'de');
+    const store = configure({
+      defaultLang: 'en',
+      supportedLangs: ['en', 'pl', 'de'],
+      persistSelectedLanguage: false,
+      restoreSelectedLanguage: true,
+      loader: noop,
+    });
+    await store.restoreLang();
+    expect(store.currentLang()).toBe('de');
+    // Writes stay disabled.
+    await store.setLang('pl');
+    expect(localStorage.getItem(KEY)).toBe('de');
+  });
+
+  it('does not restore when persistSelectedLanguage is false and restore is unset', async () => {
+    localStorage.setItem(KEY, 'de');
+    const store = configure({
+      defaultLang: 'en',
+      supportedLangs: ['en', 'pl', 'de'],
+      persistSelectedLanguage: false,
+      detectBrowserLanguage: false,
+      loader: noop,
+    });
+    await store.restoreLang();
+    expect(store.currentLang()).toBe('en');
+  });
+
   it('uses a custom persistKey when configured', async () => {
     const store = configure({ defaultLang: 'en', persistKey: 'my.lang', loader: noop });
     await store.setLang('pl');
