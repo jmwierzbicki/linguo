@@ -23,8 +23,8 @@ function loadTemplate(): string {
 /**
  * Build a single, self-contained prompt that instructs an LLM to translate a
  * whole `.po` catalog. The template explains ng-linguo's concepts (context,
- * BBCode placeholders, MessageFormat 2 plurals/selection) and is filled with
- * the target language label and the catalog contents.
+ * slot tags, MessageFormat 2 plurals/selection) and is filled with the target
+ * language label and the catalog contents.
  *
  * @param targetLanguage human-readable label for the language to translate
  *   into, e.g. `"Polish (pl)"`.

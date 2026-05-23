@@ -7,3 +7,4 @@ export { mergeCatalog } from './lib/merge';
 export { compileEntries } from './lib/compile';
 export { parseConfig, DEFAULT_CONFIG } from './lib/config';
 export type { LinguoConfig } from './lib/config';
+export type { TranslateFunction, TranslateRequest } from './lib/translator';

@@ -10,6 +10,7 @@ Create and edit `linguo.config.json` from the CLI.
   flags (`--locales en,pl …`, `--source-locale`, `--src`, `--catalogs`, `--out`,
   `--reference-base`, `--force`) for scripted/CI use.
 - The guided interactive menu now **offers to create** a config when none is
-  found (instead of dead-ending), and gains an **"Edit configuration"** item to
-  change settings in place.
+  found (instead of dead-ending), and gains an **"Edit configuration"** item.
+  Editing is a BIOS-style settings screen: it lists every value with its current
+  setting, and selecting one opens just that field's editor, then Save or Discard.
 - New pure helper `serializeConfig()` round-trips with `parseConfig()`.
