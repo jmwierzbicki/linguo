@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 
-import { bbcodeToText } from './bbcode-parser';
+import { slotsToText } from './slot-parser';
 import { MESSAGE_FORMATTER } from './message-formatter';
 import { TranslateStore } from './translate.store';
 import type { TranslateOptions } from './types';
@@ -38,8 +38,8 @@ export function injectTranslate(): TranslateFn {
     if (options?.params && formatter) {
       message = formatter.format(message, options.params, store.currentLang() || 'en');
     }
-    // Returns a string, so BBCode placeholders degrade to their inner text;
-    // the `[t]` directive renders them into templates instead.
-    return bbcodeToText(message);
+    // Returns a string, so slot tags degrade to their inner text; the `[t]`
+    // directive renders them into templates instead.
+    return slotsToText(message);
   };
 }
