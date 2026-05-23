@@ -1,25 +1,30 @@
 /**
- * A node in a parsed BBCode tree produced by {@link parseBBCode}.
+ * A node in a parsed slot tree produced by {@link parseSlots}.
  *
  * - `text` nodes carry literal, translator-authored text. They are rendered as
  *   DOM text nodes — never as HTML — which is how the library keeps its XSS
  *   surface at zero by construction.
- * - `placeholder` nodes correspond to a `[name]...[/name]` region that the
- *   developer binds to an `<ng-template>`. Placeholders may nest.
+ * - `slot` nodes correspond to a `[name]...[/name]` region that the developer
+ *   fills with an `<ng-template>`. The bracket syntax resembles BBCode, but the
+ *   names are arbitrary and author-chosen and carry no predefined rendering —
+ *   each is a named slot bound to a template. Slots may nest.
  */
-export type BBCodeNode =
+export type SlotNode =
   | { readonly kind: 'text'; readonly value: string }
   | {
-      readonly kind: 'placeholder';
+      readonly kind: 'slot';
       readonly name: string;
-      readonly children: readonly BBCodeNode[];
+      readonly children: readonly SlotNode[];
     };
 
 /**
- * Matches a single BBCode tag at the start of a string: an optional leading
- * slash (closing tag) followed by a name. The name grammar
+ * Matches a single slot tag at the start of a string: an optional leading slash
+ * (closing tag) followed by a name. The name grammar
  * (`[a-zA-Z_][a-zA-Z0-9_-]*`) is part of the public contract — see CLAUDE.md
  * §5.1. Changing it is a major version bump.
+ *
+ * A literal `[` is written as `[[`; that escape is handled in {@link tokenize}
+ * before this pattern is tried, so a tag is never matched across an escape.
  */
 const TAG_PATTERN = /^\[(\/?)([a-zA-Z_][a-zA-Z0-9_-]*)\]/;
 
@@ -42,6 +47,15 @@ function tokenize(input: string): readonly Token[] {
   let index = 0;
   while (index < input.length) {
     if (input[index] === '[') {
+      // `[[` is an escaped literal `[` — the one way a translatable string can
+      // contain text that looks like a slot tag (e.g. `[note]`) without it being
+      // parsed as one. Checked before TAG_PATTERN so the escape always wins; a
+      // lone `]` needs no escape, since it is never significant on its own.
+      if (input[index + 1] === '[') {
+        buffer += '[';
+        index += 2;
+        continue;
+      }
       const match = TAG_PATTERN.exec(input.slice(index));
       if (match) {
         // Defaults satisfy `noUncheckedIndexedAccess` without non-null `!`.
@@ -63,10 +77,10 @@ function tokenize(input: string): readonly Token[] {
 
 interface OpenFrame {
   readonly name: string;
-  readonly children: BBCodeNode[];
+  readonly children: SlotNode[];
 }
 
-function appendText(into: BBCodeNode[], value: string): void {
+function appendText(into: SlotNode[], value: string): void {
   const last = into[into.length - 1];
   if (last && last.kind === 'text') {
     into[into.length - 1] = { kind: 'text', value: last.value + value };
@@ -76,29 +90,33 @@ function appendText(into: BBCodeNode[], value: string): void {
 }
 
 /**
- * Parse a translator-authored string into a tree of {@link BBCodeNode}s.
+ * Parse a translator-authored string into a tree of {@link SlotNode}s.
  *
  * The parser is total: every input produces a tree, and any malformed
  * construct (a stray `[`, an unclosed tag, a mismatched closing tag) degrades
  * gracefully to literal text rather than throwing. Well-formed
- * `[name]...[/name]` regions — including nested ones — become `placeholder`
- * nodes.
+ * `[name]...[/name]` regions — including nested ones — become `slot` nodes. To
+ * include a literal `[` (so text such as `[note]` is not read as a tag), double
+ * it: `[[` parses to a single `[`.
  *
  * @example
  * ```ts
- * parseBBCode('Hello [b]world[/b]!');
+ * parseSlots('Hello [b]world[/b]!');
  * // [
  * //   { kind: 'text', value: 'Hello ' },
- * //   { kind: 'placeholder', name: 'b', children: [{ kind: 'text', value: 'world' }] },
+ * //   { kind: 'slot', name: 'b', children: [{ kind: 'text', value: 'world' }] },
  * //   { kind: 'text', value: '!' },
  * // ]
+ *
+ * parseSlots('See [[b] for bold');
+ * // [{ kind: 'text', value: 'See [b] for bold' }]
  * ```
  */
-export function parseBBCode(input: string): readonly BBCodeNode[] {
-  const root: BBCodeNode[] = [];
+export function parseSlots(input: string): readonly SlotNode[] {
+  const root: SlotNode[] = [];
   const stack: OpenFrame[] = [];
 
-  const current = (): BBCodeNode[] => {
+  const current = (): SlotNode[] => {
     const top = stack.at(-1);
     return top ? top.children : root;
   };
@@ -116,7 +134,7 @@ export function parseBBCode(input: string): readonly BBCodeNode[] {
     const top = stack.at(-1);
     if (top && top.name === token.name) {
       stack.pop();
-      current().push({ kind: 'placeholder', name: top.name, children: top.children });
+      current().push({ kind: 'slot', name: top.name, children: top.children });
     } else {
       // No matching open tag: treat the closing tag as literal text.
       appendText(current(), `[/${token.name}]`);
@@ -140,7 +158,7 @@ export function parseBBCode(input: string): readonly BBCodeNode[] {
   return root;
 }
 
-function collectText(nodes: readonly BBCodeNode[]): string {
+function collectText(nodes: readonly SlotNode[]): string {
   let text = '';
   for (const node of nodes) {
     text += node.kind === 'text' ? node.value : collectText(node.children);
@@ -149,17 +167,18 @@ function collectText(nodes: readonly BBCodeNode[]): string {
 }
 
 /**
- * Flatten a BBCode string to plain text: placeholder tags are dropped and their
- * inner text is kept. This is how the `t` pipe and {@link injectTranslate}
- * render a message containing `[name]...[/name]` placeholders — they return a
- * string, so the markup degrades to text (the `[t]` directive renders the
- * placeholders into templates instead).
+ * Flatten a slot string to plain text: slot tags are dropped and their inner
+ * text is kept. This is how the `t` pipe and {@link injectTranslate} render a
+ * message containing `[name]...[/name]` slots — they return a string, so the
+ * markup degrades to text (the `[t]` directive renders the slots into templates
+ * instead).
  *
  * @example
  * ```ts
- * bbcodeToText('Read the [docs]documentation[/docs] now'); // 'Read the documentation now'
+ * slotsToText('Read the [docs]documentation[/docs] now'); // 'Read the documentation now'
+ * slotsToText('Press [[Enter] to send'); // 'Press [Enter] to send'
  * ```
  */
-export function bbcodeToText(input: string): string {
-  return collectText(parseBBCode(input));
+export function slotsToText(input: string): string {
+  return collectText(parseSlots(input));
 }

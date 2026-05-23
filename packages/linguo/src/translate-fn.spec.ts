@@ -50,7 +50,7 @@ describe('injectTranslate', () => {
     expect(t('Hi {name}', { params: { name: 'Ada' } })).toBe('Hi Ada');
   });
 
-  it('flattens BBCode placeholders to their inner text', async () => {
+  it('flattens slot tags to their inner text', async () => {
     const { store, t } = setup();
     await store.setLang('en');
     expect(t('Read the [docs]documentation[/docs] now')).toBe('Read the documentation now');
