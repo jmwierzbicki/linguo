@@ -21,18 +21,22 @@ zero RxJS plumbing in your components.
 ```
 
 <p align="center">
-  <img
-    src="https://raw.githubusercontent.com/jmwierzbicki/linguo/main/apps/playground/public/linguo-demo.gif"
-    alt="Switching languages in the ng-linguo playground — every example re-renders reactively"
-    width="800"
-  />
+  <a href="https://jmwierzbicki.github.io/linguo/">
+    <img
+      src="https://raw.githubusercontent.com/jmwierzbicki/linguo/main/apps/playground/public/linguo-demo.gif"
+      alt="Switching languages in the ng-linguo playground — every example re-renders reactively"
+      width="800"
+    />
+  </a>
   <br />
   <em>Switch the language and every binding re-renders — no reload, no subscriptions.</em>
+  <br />
+  <strong><a href="https://jmwierzbicki.github.io/linguo/">▶ Try the live demo</a></strong>
 </p>
 
-> **Status:** pre-release (`0.9.0`), not yet published to npm. The runtime, the
-> extraction CLI, and the full test suite are in place and green. APIs may still
-> shift before `1.0`.
+> **Status:** pre-release (`0.9.x`) — published to npm and usable today. The
+> runtime, the extraction CLI, and the full test suite are in place and green.
+> APIs may still shift before `1.0`.
 
 ## Why ng-linguo
 
@@ -221,10 +225,11 @@ The strings above are also your source catalog. Use the
 JSON your loader serves:
 
 ```bash
-npx linguo-extract init --locales en,pl,de   # one-time: create linguo.config.json
-linguo-extract extract                        # scan source → en/pl/de .po catalogs
-linguo-extract translate --all                # fill missing entries with AI (optional)
-linguo-extract compile                        # .po → runtime JSON
+npm i -D @ng-linguo/extract                   # one-time: install the CLI
+npx linguo-extract init --locales en,pl,de    # create linguo.config.json
+npx linguo-extract extract                    # scan source → en/pl/de .po catalogs
+npx linguo-extract translate --all            # fill missing entries with AI (optional)
+npx linguo-extract compile                    # .po → runtime JSON
 ```
 
 That's the whole loop. See [Translation workflow](#translation-workflow) for the
@@ -265,13 +270,15 @@ they can render.
 `@ng-linguo/extract` is a pure-Node CLI (no Angular dependency, so it never
 drags the framework into your tooling) that turns your source into translation
 files and back. It reads a `linguo.config.json` — auto-discovered — listing your
-locales and paths.
+locales and paths. Install it once as a dev dependency; its bin is
+`linguo-extract`, so you invoke it with `npx` (or from an npm script):
 
 ```bash
-linguo-extract init       # create/edit linguo.config.json
-linguo-extract extract    # scan source → <locale>.po catalogs (additive)
-linguo-extract translate  # fill missing entries with AI (needs a translator)
-linguo-extract compile    # .po catalogs → runtime <locale>.json
+npm i -D @ng-linguo/extract   # install once; the bin is `linguo-extract`
+npx linguo-extract init       # create/edit linguo.config.json
+npx linguo-extract extract    # scan source → <locale>.po catalogs (additive)
+npx linguo-extract translate  # fill missing entries with AI (needs a translator)
+npx linguo-extract compile    # .po catalogs → runtime <locale>.json
 ```
 
 ### The interactive menu
@@ -304,11 +311,11 @@ their source text plus `context`. Re-running it is safe and idempotent.
 Adding a locale is a couple of steps — or a couple of clicks in the menu:
 
 ```bash
-linguo-extract init --locales en,pl,de,fr   # add `fr` to the config
-linguo-extract extract                        # seeds fr.po with the source strings
-linguo-extract translate --locale fr          # fill it in with AI…
-# …or: linguo-extract copyprompt fr           # …or copy a prompt for any chat model
-linguo-extract compile                        # produce fr.json
+npx linguo-extract init --locales en,pl,de,fr   # add `fr` to the config
+npx linguo-extract extract                       # seeds fr.po with the source strings
+npx linguo-extract translate --locale fr         # fill it in with AI…
+# …or: npx linguo-extract copyprompt fr          # …or copy a prompt for any chat model
+npx linguo-extract compile                       # produce fr.json
 ```
 
 ### Translating with AI
@@ -318,13 +325,13 @@ has all the context it needs. ng-linguo writes a self-contained prompt that
 teaches the model your `context` notes, slot tags, and plural rules, and only
 ever sends entries that are still missing. Two ways to run it:
 
-- **Clipboard (no key, no config):** `linguo-extract copyprompt pl` copies the
-  prompt; paste it into any chat model and save the reply over `pl.po`.
+- **Clipboard (no key, no config):** `npx linguo-extract copyprompt pl` copies
+  the prompt; paste it into any chat model and save the reply over `pl.po`.
 - **Automatic:** point the `translator` config field at a small module that
   calls your AI provider. ng-linguo builds the prompt and merges the reply; your
   SDK and API key stay yours. See the
-  [`@ng-linguo/extract` README](./packages/extract/README.md) for a copy-paste
-  module (OpenAI, Anthropic, or any provider).
+  [`@ng-linguo/extract` README](https://github.com/jmwierzbicki/linguo/tree/main/packages/extract#readme)
+  for a copy-paste module (OpenAI, Anthropic, or any provider).
 
 ### In CI
 
@@ -332,12 +339,12 @@ Every command runs non-interactively and deterministically, so the pipeline
 drops into CI as-is:
 
 ```bash
-linguo-extract extract        # fails the build if it errors; idempotent otherwise
-linguo-extract translate --all  # optional: fill any gaps (needs a translator)
-linguo-extract compile
+npx linguo-extract extract          # fails the build if it errors; idempotent otherwise
+npx linguo-extract translate --all  # optional: fill any gaps (needs a translator)
+npx linguo-extract compile
 ```
 
-`init` is scriptable too: `linguo-extract init --locales en,pl,de --out public/i18n`.
+`init` is scriptable too: `npx linguo-extract init --locales en,pl,de --out public/i18n`.
 
 ## Configuration
 
@@ -378,8 +385,10 @@ fetching `${prefix}${lang}${suffix}`. A loader is just an object with a
 
 ## Contributing
 
-This is an Nx + pnpm monorepo. [CLAUDE.md](./CLAUDE.md) is the source of truth
-for architecture, code style, testing, and release conventions — read it first.
+This is an Nx + pnpm monorepo.
+[CLAUDE.md](https://github.com/jmwierzbicki/linguo/blob/main/CLAUDE.md) is the
+source of truth for architecture, code style, testing, and release conventions —
+read it first.
 
 ```bash
 pnpm install
@@ -389,4 +398,4 @@ pnpm nx serve playground              # the demo app
 
 ## License
 
-[MIT](./LICENSE)
+[MIT](https://github.com/jmwierzbicki/linguo/blob/main/LICENSE)

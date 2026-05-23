@@ -20,7 +20,11 @@
         "main": "packages/extract/src/index.ts",
         "tsConfig": "packages/extract/tsconfig.lib.json",
         "assets": [
-          "packages/extract/*.md",
+          {
+            "input": "packages/extract",
+            "glob": "*.md",
+            "output": "."
+          },
           {
             "input": "packages/extract/src/lib",
             "glob": "*.txt",
