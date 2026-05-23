@@ -8,7 +8,7 @@ describe('extractMessages', () => {
     expect(result).toEqual([{ keyId: 'Play', context: '', references: ['a.html:1'] }]);
   });
 
-  it('extracts the message from a t directive attribute (ICU and BBCode are safe there)', () => {
+  it('extracts the message from a t directive attribute (ICU and slot tags are safe there)', () => {
     const result = extractMessages([
       { path: 'a.html', content: `<p t="Hello [b]world[/b] {$name}!"></p>` },
     ]);
@@ -54,6 +54,18 @@ describe('extractMessages', () => {
         context: '',
         references: ['app.ts:1'],
       },
+    ]);
+  });
+
+  it('captures the context from a mark() options object', () => {
+    const result = extractMessages([
+      {
+        path: 'app.ts',
+        content: `readonly files = mark('{$count} files', { context: 'file = a document' });`,
+      },
+    ]);
+    expect(result).toEqual([
+      { keyId: '{$count} files', context: 'file = a document', references: ['app.ts:1'] },
     ]);
   });
 
@@ -131,5 +143,50 @@ describe('extractMessages', () => {
   it('reports the line number of each occurrence', () => {
     const result = extractMessages([{ path: 'a.html', content: `line one\n{{ 'Play' | t }}` }]);
     expect(result[0]?.references).toEqual(['a.html:2']);
+  });
+
+  it('skips a region wrapped in linguo-ignore-start/end but keeps strings outside it', () => {
+    const result = extractMessages([
+      {
+        path: 'a.ts',
+        content:
+          `const real = mark('Keep me');\n` +
+          `// linguo-ignore-start\n` +
+          `const sample = "<p t=\\"Doc only\\"></p> and mark('Doc too')";\n` +
+          `// linguo-ignore-end\n` +
+          `const also = mark('Keep me too');\n`,
+      },
+    ]);
+    expect(result.map((e) => e.keyId)).toEqual(['Keep me', 'Keep me too']);
+  });
+
+  it('skips an entire file marked with linguo-ignore-file', () => {
+    const result = extractMessages([
+      {
+        path: 'samples.ts',
+        content: `// linguo-ignore-file\nconst a = mark('Nope');\nconst b = 'Also nope' + ' | t';`,
+      },
+    ]);
+    expect(result).toEqual([]);
+  });
+
+  it('skips only the line after linguo-ignore-next-line', () => {
+    const result = extractMessages([
+      {
+        path: 'a.html',
+        content: `{{ 'Before' | t }}\n<!-- linguo-ignore-next-line -->\n{{ 'Skipped' | t }}\n{{ 'After' | t }}`,
+      },
+    ]);
+    expect(result.map((e) => e.keyId)).toEqual(['Before', 'After']);
+  });
+
+  it('treats an unclosed linguo-ignore-start as ignoring to end of file', () => {
+    const result = extractMessages([
+      {
+        path: 'a.ts',
+        content: `const real = mark('Keep');\n// linguo-ignore-start\nconst sample = mark('Gone');`,
+      },
+    ]);
+    expect(result.map((e) => e.keyId)).toEqual(['Keep']);
   });
 });

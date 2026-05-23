@@ -38,7 +38,7 @@ describe('createHttpLoader', () => {
     request.flush({});
   });
 
-  it('returns the compiled dictionary verbatim, preserving BBCode placeholders', () => {
+  it('returns the compiled dictionary verbatim, preserving slot tags', () => {
     const loader = makeLoader();
     const result = loader.load('pl');
     http.expectOne('/assets/i18n/pl.json').flush({ 'Hello [b]world[/b]': 'Witaj [b]świecie[/b]' });

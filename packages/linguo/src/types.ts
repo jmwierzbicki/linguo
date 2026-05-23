@@ -1,8 +1,8 @@
 /**
  * A flat map of translation keys to their resolved string values for a single
- * language. Values are plain strings (optionally containing BBCode placeholders
- * and ICU syntax) — never HTML. This is the on-disk JSON shape, kept stable
- * since v1 so translators can keep using existing tooling.
+ * language. Values are plain strings (optionally containing `[name]...[/name]`
+ * slot tags and ICU syntax) — never HTML. This is the on-disk JSON shape, kept
+ * stable since v1 so translators can keep using existing tooling.
  */
 export type Translations = Readonly<Record<string, string>>;
 

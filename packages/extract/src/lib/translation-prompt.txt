@@ -52,9 +52,9 @@ the same `msgid` but different `msgctxt` are independent and usually need
 different translations.
 
 ================================================================
-4. BBCODE PLACEHOLDERS — `[name]...[/name]`
+4. SLOT TAGS — `[name]...[/name]`
 ================================================================
-Some sources contain BBCode tags, e.g.:
+Some sources contain slot tags (a BBCode-like bracket syntax), e.g.:
 
     msgid "Read the [docs]documentation[/docs] to get started"
 
@@ -66,6 +66,12 @@ These tags map to interactive UI (links, buttons) at runtime.
 - You MAY move a tag pair to wherever the wrapped phrase naturally lands
   in {{TARGET_LANGUAGE}} word order, as long as the pair stays matched
   and wraps the same concept.
+- A literal `[` is written as a doubled `[[` — the ONLY escape in this
+  syntax. `[[` is NOT a slot tag; it renders as a single visible `[`.
+  Keep every `[[` exactly as a doubled bracket (never collapse it to one
+  `[`, never expand it) and translate the prose around it. So
+  `[[b]bold[[/b]` displays the literal characters `[b]bold[/b]`, and a
+  sentence built around that is describing the escape mechanism itself.
 
 Example (→ German):
   msgid  "Read the [docs]documentation[/docs] to get started"
@@ -176,6 +182,29 @@ appear:
 ================================================================
 - Translate meaning, not words. Match the register a UI button / label /
   sentence would use in {{TARGET_LANGUAGE}}.
+- Aim for a result that reads as if ORIGINALLY WRITTEN in
+  {{TARGET_LANGUAGE}}, not transcoded from English. You are free to
+  restructure: reorder clauses, split one sentence into two or merge two
+  into one, change voice, drop filler connectives — whatever natural
+  phrasing wants. The source fixes the MEANING and the
+  placeholders/slots/tags, not the word order or sentence shape. Output
+  that is grammatical but stiff, word-for-word, or obviously translated is
+  a FAILURE here. Mirroring English clause order often produces broken
+  target grammar — rebuild the sentence instead.
+- Infer each message's DOMAIN and register from its own content and the
+  app's other strings — it may be software, medical, legal, finance,
+  gaming, marketing, hospitality, anything. Then translate the way a
+  domain expert writing in {{TARGET_LANGUAGE}} would, using that field's
+  established terminology — not a literal everyday rendering, and not
+  jargon borrowed from the wrong field. Technical terms usually have a
+  settled target-language form — sometimes a native word, sometimes a
+  borrowed or anglicized term that practitioners actually say; use
+  whichever is REAL in the field, not a coined literal calque. You do NOT need a
+  `msgctxt` to do this — the source text itself is the signal (treat
+  `msgctxt`, when present, as a tie-breaker). Example: in "Escaped
+  [[b]bold[[/b] stays literal" the surrounding markup marks a software
+  context, so "Escaped" is character-escaping — pick the term a developer
+  uses, not the word for fleeing/running away.
 - Respect the context (§3) when the same source has several entries.
 - Keep capitalization and punctuation idiomatic for the target language.
 

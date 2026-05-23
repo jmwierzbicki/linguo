@@ -24,7 +24,10 @@ const PIPE_PATTERN =
   /(['"])((?:\\.|(?!\1).)*?)\1\s*\|\s*t\b(?:\s*:\s*(\{(?:[^{}]|\{[^{}]*\})*\}))?/g;
 // `mark('...')` — the extraction marker for messages defined outside a template
 // (e.g. a component field). Not preceded by `.` so `foo.mark(...)` is ignored.
-const MARK_PATTERN = /(?<!\.)\bmark\s*\(\s*(['"])((?:\\.|(?!\1).)*?)\1/g;
+// Group 2 is the key; group 3 is the optional options object (`mark('…', { … })`,
+// one level of nesting), from which the context is read.
+const MARK_PATTERN =
+  /(?<!\.)\bmark\s*\(\s*(['"])((?:\\.|(?!\1).)*?)\1(?:\s*,\s*(\{(?:[^{}]|\{[^{}]*\})*\}))?/g;
 // The `t('...', { ... })` helper call (from `injectTranslate()`). The lookbehind
 // keeps it from matching `obj.t(`, `$t(`, or the tail of an identifier. Group 2
 // is the key; group 3 is the options object, from which the context is read.
@@ -41,6 +44,57 @@ const CONTEXT_IN_OPTIONS = /\bcontext\s*:\s*(['"])((?:\\.|(?!\1).)*?)\1/;
 
 // Joins context and key for the dedup map (gettext EOT glue).
 const GLUE = String.fromCharCode(4);
+
+// Source-comment directives that exclude regions from extraction — for
+// documentation samples whose strings would otherwise scan as real messages.
+// Matched as plain substrings, so they work the same in `//`, `/* */`, and
+// `<!-- -->` comments without the scanner having to understand any of them.
+const IGNORE_FILE = 'linguo-ignore-file';
+const IGNORE_MARKER = /linguo-ignore-(next-line|start|end)/g;
+
+interface IgnoredRange {
+  readonly start: number;
+  readonly end: number;
+}
+
+/**
+ * Character ranges of `content` excluded from extraction by `linguo-ignore`
+ * directives:
+ *
+ * - `linguo-ignore-file` anywhere — skip the whole file.
+ * - `linguo-ignore-start` … `linguo-ignore-end` — skip everything between them;
+ *   an unmatched `start` skips to end of file.
+ * - `linguo-ignore-next-line` — skip the single line after the directive.
+ */
+function ignoredRanges(content: string): readonly IgnoredRange[] {
+  if (content.includes(IGNORE_FILE)) {
+    return [{ start: 0, end: content.length }];
+  }
+  const ranges: IgnoredRange[] = [];
+  let blockStart: number | null = null;
+  IGNORE_MARKER.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = IGNORE_MARKER.exec(content)) !== null) {
+    const kind = match[1];
+    if (kind === 'next-line') {
+      const lineEnd = content.indexOf('\n', match.index);
+      if (lineEnd === -1) {
+        continue; // directive on the last line — nothing follows to skip
+      }
+      const after = content.indexOf('\n', lineEnd + 1);
+      ranges.push({ start: lineEnd + 1, end: after === -1 ? content.length : after });
+    } else if (kind === 'start') {
+      blockStart ??= match.index;
+    } else if (kind === 'end' && blockStart !== null) {
+      ranges.push({ start: blockStart, end: match.index });
+      blockStart = null;
+    }
+  }
+  if (blockStart !== null) {
+    ranges.push({ start: blockStart, end: content.length });
+  }
+  return ranges;
+}
 
 function unescapeJs(value: string): string {
   return value.replace(/\\([\\'"`ntr])/g, (_match, char: string) => {
@@ -97,6 +151,10 @@ interface Found {
  * Pure and DOM-free, so it runs in CI on plain Node (CLAUDE.md §2.1). Entries
  * are returned in order of discovery — files in the order given, and within a
  * file by source position — so re-extraction produces a stable, readable order.
+ *
+ * Regions marked with `linguo-ignore` comment directives are skipped, so
+ * documentation samples containing `mark(`, `'…' | t`, or `t="…"` are not
+ * scanned as real messages (see {@link ignoredRanges}).
  */
 export function extractMessages(files: readonly SourceFile[]): ExtractedMessage[] {
   const occurrences = new Map<string, Occurrence>();
@@ -122,11 +180,7 @@ export function extractMessages(files: readonly SourceFile[]): ExtractedMessage[
     MARK_PATTERN.lastIndex = 0;
     let markMatch: RegExpExecArray | null;
     while ((markMatch = MARK_PATTERN.exec(file.content)) !== null) {
-      found.push({
-        index: markMatch.index,
-        keyId: normalizeMessage(unescapeJs(markMatch[2] ?? '')),
-        context: '',
-      });
+      fromOptions(markMatch.index, markMatch[2] ?? '', markMatch[3]);
     }
 
     T_CALL_PATTERN.lastIndex = 0;
@@ -154,7 +208,15 @@ export function extractMessages(files: readonly SourceFile[]): ExtractedMessage[
     // Interleave pipe and directive matches by source position so discovery
     // order reflects how the file actually reads.
     found.sort((a, b) => a.index - b.index);
+
+    const ignored = ignoredRanges(file.content);
+    const isIgnored = (index: number): boolean =>
+      ignored.some((range) => index >= range.start && index < range.end);
+
     for (const item of found) {
+      if (isIgnored(item.index)) {
+        continue;
+      }
       record(occurrences, item, `${file.path}:${lineOf(file.content, item.index)}`);
     }
   }

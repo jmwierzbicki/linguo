@@ -89,6 +89,11 @@ export function findConfigFile(startDir: string): string | undefined {
  * ```
  */
 export interface LinguoConfig {
+  /**
+   * Path or URL to the JSON schema, for editor autocomplete and validation.
+   * Preserved on read/write; the CLI fills in a default when creating a config.
+   */
+  readonly $schema?: string;
   /** Languages to generate catalogs for. Required and non-empty. */
   readonly locales: readonly string[];
   /** Language whose entries hold the source text (no missing flag). Default `en`. */
@@ -107,10 +112,25 @@ export interface LinguoConfig {
    *   root), so paths resolve for terminal Ctrl+Click and editor tooling.
    */
   readonly referenceBase: 'config' | 'workspace';
+  /**
+   * Path to a module that exports a `translate` function (or a default function)
+   * for automatic AI translation, resolved relative to this config file. When
+   * set, `linguo-extract translate` and the menu's "Automatic" option call it
+   * with a ready-built prompt and merge its reply. The consumer owns the
+   * provider SDK and API secrets. Omit to translate via the clipboard instead.
+   */
+  readonly translator?: string;
 }
 
+/**
+ * The `$schema` reference written into freshly-created configs. Resolves for an
+ * installed consumer (the schema ships at the package root); editors read it
+ * relative to the config file. An existing `$schema` is always preserved over this.
+ */
+export const CONFIG_SCHEMA_REF = './node_modules/@ng-linguo/extract/linguo.config.schema.json';
+
 /** Defaults applied for any field a config file omits (except `locales`). */
-export const DEFAULT_CONFIG: Omit<LinguoConfig, 'locales'> = {
+export const DEFAULT_CONFIG: Omit<LinguoConfig, 'locales' | '$schema'> = {
   sourceLocale: 'en',
   src: 'src',
   catalogs: 'i18n',
@@ -155,13 +175,27 @@ export function parseConfig(raw: string): LinguoConfig {
     throw new Error('linguo config: "referenceBase" must be "config" or "workspace"');
   }
 
+  const translator = record['translator'];
+  if (translator !== undefined && typeof translator !== 'string') {
+    throw new Error('linguo config: "translator" must be a string path to a module');
+  }
+
+  const schema = record['$schema'];
+  if (schema !== undefined && typeof schema !== 'string') {
+    throw new Error('linguo config: "$schema" must be a string');
+  }
+
   return {
+    // Preserve $schema so editor tooling keeps working after a CLI round-trip.
+    ...(typeof schema === 'string' && schema.length > 0 ? { $schema: schema } : {}),
     locales,
     sourceLocale: asString(record['sourceLocale'], DEFAULT_CONFIG.sourceLocale),
     src: asString(record['src'], DEFAULT_CONFIG.src),
     catalogs: asString(record['catalogs'], DEFAULT_CONFIG.catalogs),
     output: asString(record['output'], DEFAULT_CONFIG.output),
     referenceBase: referenceBase === 'workspace' ? 'workspace' : DEFAULT_CONFIG.referenceBase,
+    // Only carry a non-empty translator; absence means "clipboard flow".
+    ...(typeof translator === 'string' && translator.length > 0 ? { translator } : {}),
   };
 }
 
@@ -170,13 +204,19 @@ export function parseConfig(raw: string): LinguoConfig {
  * (stable field order, trailing newline). Round-trips with {@link parseConfig}.
  */
 export function serializeConfig(config: LinguoConfig): string {
-  const ordered = {
-    locales: config.locales,
-    sourceLocale: config.sourceLocale,
-    src: config.src,
-    catalogs: config.catalogs,
-    output: config.output,
-    referenceBase: config.referenceBase,
-  };
+  const ordered: Record<string, unknown> = {};
+  // $schema goes first by convention so editors pick it up immediately.
+  if (config.$schema !== undefined) {
+    ordered['$schema'] = config.$schema;
+  }
+  ordered['locales'] = config.locales;
+  ordered['sourceLocale'] = config.sourceLocale;
+  ordered['src'] = config.src;
+  ordered['catalogs'] = config.catalogs;
+  ordered['output'] = config.output;
+  ordered['referenceBase'] = config.referenceBase;
+  if (config.translator !== undefined) {
+    ordered['translator'] = config.translator;
+  }
   return `${JSON.stringify(ordered, null, 2)}\n`;
 }

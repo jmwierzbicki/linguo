@@ -11,6 +11,8 @@ allowBuilds:
   less: true
   lmdb: true
   msgpackr-extract: true
+  '@google/genai': false
+  protobufjs: false
 # Pin the jest runtime stack to one version so jest-runtime 30.4 and the test
 # environment share a jest-mock with the same mocker API (avoids the duplicate
 # jest-mock@30.3 / @30.4 → clearMocksOnScope TypeError).

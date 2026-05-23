@@ -1,0 +1,378 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: apps/playground/src/app/app.html:10
+msgctxt "Small badge beside the product name; labels this page as an interactive demo/sandbox, not a children's playground"
+msgid "playground"
+msgstr "プレイグラウンド"
+
+#: apps/playground/src/app/app.html:21
+msgctxt "Tooltip on a status dot. 'isReady()' is an API name — keep it verbatim. 'gate UI on this' = show the UI only once it is ready; 'flash-of-untranslated-content' is the technical term for untranslated text briefly showing (FOUC)"
+msgid "isReady() — gate UI on this to avoid flash-of-untranslated-content"
+msgstr "isReady() — 未翻訳コンテンツのちらつきを避けるため、UIをこれで制御します"
+
+#: apps/playground/src/app/app.html:29
+msgid "ready"
+msgstr "準備完了"
+
+#: apps/playground/src/app/app.html:29
+msgid "loading…"
+msgstr "読み込み中…"
+
+#: apps/playground/src/app/app.html:57
+msgctxt "Heading above the sidebar table-of-contents navigation links"
+msgid "On this page"
+msgstr "このページの内容"
+
+#: apps/playground/src/app/app.html:84
+msgctxt "Hero tagline (marketing register). 'Angular' is the framework name and 'i18n' the abbreviation for internationalization — keep both. 'signal-first' means built around Angular Signals; render the technical sense, not 'first signal'"
+msgid "Angular i18n, the signal-first way"
+msgstr "Angular i18n、シグナルファーストのアプローチ"
+
+#: apps/playground/src/app/app.html:91
+msgctxt "Hero subheading (marketing prose). Keep the product/tech names verbatim: 'ng-linguo', 'Angular', 'SignalStore', 'HTML'. 'signals'/'store methods' are Angular Signals concepts; 'reads'/'writes' are data access, not literal reading/writing"
+msgid "ng-linguo is a complete internationalization solution for Angular built on a SignalStore. Reads are signals, writes are store methods, and translators never see a line of HTML. Flip the language switcher above and watch every example below re-render reactively."
+msgstr "ng-linguoは、SignalStore上に構築されたAngular向けの完全な国際化ソリューションです。読み取りはシグナル、書き込みはストアメソッドで行われ、翻訳者がHTMLコードを目にすることはありません。上部の言語スイッチャーを切り替えて、以下のすべての例がリアクティブに再レンダリングされる様子をご覧ください。"
+
+#: apps/playground/src/app/app.html:101
+msgctxt "Section heading: initial setup / installation of the library"
+msgid "Setup"
+msgstr "セットアップ"
+
+#: apps/playground/src/app/app.html:108
+msgctxt "Card title. 'store' = the ng-linguo SignalStore (a noun); 'Bootstrap' = set up / initialize"
+msgid "Bootstrap the store"
+msgstr "ストアのブートストラップ"
+
+#: apps/playground/src/app/app.html:112
+msgctxt "Card body (developer-docs tone). Keep API names verbatim: provideTranslate(), restoreLang(). 'store' = the SignalStore; 'loads' = fetches translations; 'Dictionaries' = the JSON translation files; 'keyed by source string' = the English text is the lookup key"
+msgid "provideTranslate() wires up the store; it never loads automatically — restoreLang() is the explicit kick-off. Dictionaries are plain JSON keyed by source string."
+msgstr "provideTranslate()はストアを接続しますが、自動的に読み込まれることはありません。restoreLang()が明示的な開始点です。辞書はソース文字列をキーとするプレーンなJSONです。"
+
+#: apps/playground/src/app/app.html:122
+msgctxt "Section heading. 'pipe' is the Angular template-pipe concept — keep the technical term; [code] wraps the code symbol 't'"
+msgid "The [code]t[/code] pipe"
+msgstr "[code]t[/code]パイプ"
+
+#: apps/playground/src/app/app.html:131
+msgctxt "Card title. 'template' = the Angular HTML template"
+msgid "Translate in the template"
+msgstr "テンプレートでの翻訳"
+
+#: apps/playground/src/app/app.html:134
+msgctxt "Card body. 'key' = the lookup key; 'falls through to the source' = shows the original English when no translation exists; 'blank' = empty"
+msgid "The source English string is the key. With no translation it falls through to the source, so the UI is never blank."
+msgstr "ソースの英語文字列がキーとなります。翻訳がない場合はソースにフォールバックするため、UIが空白になることはありません。"
+
+#: apps/playground/src/app/app.html:139
+#: apps/playground/src/app/app.html:162
+msgid "He was driving incredibly fast!"
+msgstr "彼は信じられないほど速く運転していました！"
+
+#: apps/playground/src/app/app.html:145
+msgctxt "Section heading. 'directive' is the Angular directive concept — keep the technical term; [code] wraps the code symbol '[t]'"
+msgid "The [code][[t][/code] directive"
+msgstr "[code][[t][/code]ディレクティブ"
+
+#: apps/playground/src/app/app.html:154
+msgctxt "Card title. 'element' = an HTML / DOM element"
+msgid "Translate an element"
+msgstr "要素の翻訳"
+
+#: apps/playground/src/app/app.html:157
+msgctxt "Card body. 'signals' = Angular Signals; 'dictionary' = the JSON translation file; 'directive' = the Angular [t] directive; 'subscription bookkeeping' = manually managing RxJS subscriptions"
+msgid "Reads through to the store's signals — once a dictionary loads, the directive re-renders with no subscription bookkeeping."
+msgstr "ストアのシグナルを通じて読み取られます。辞書が読み込まれると、ディレクティブはサブスクリプション管理なしで再レンダリングされます。"
+
+#: apps/playground/src/app/app.html:173
+msgctxt "Card title. 'TypeScript' is the programming language name — keep verbatim"
+msgid "Translate in TypeScript"
+msgstr "TypeScriptでの翻訳"
+
+#: apps/playground/src/app/app.html:176
+msgctxt "Card body. 'the pipe' = the Angular t pipe; 'component code' = TypeScript class code; keep computed() verbatim; 'params' = the ICU parameters; 'reactive' = updates automatically"
+msgid "The pipe's counterpart for component code. Read it inside a computed() and it stays reactive to both params and the active language."
+msgstr "コンポーネントコードにおけるパイプの対応物です。computed()内で読み取ると、パラメーターとアクティブな言語の両方に対してリアクティブな状態を保ちます。"
+
+#: apps/playground/src/app/app.html:197
+msgctxt "Section heading: grammatical plural forms (one file / many files)"
+msgid "Plurals"
+msgstr "複数形"
+
+#: apps/playground/src/app/app.html:204
+msgctxt "Card title. 'Cardinal plurals' = counting forms (1 file / 2 files), as opposed to ordinals"
+msgid "Cardinal plurals across languages"
+msgstr "多言語における基数複数形"
+
+#: apps/playground/src/app/app.html:208
+msgctxt "Card body. EN/PL = English/Polish; one/few/many/other are CLDR plural-category names — keep them in English; 'count' is a variable name (keep); 'category switch' = the plural form changing"
+msgid "EN has one/other; PL has one/few/many/other; an exact 0 variant reads better than '0'. Walk count through 1, 2, 5, 22 in Polish to see the category switch."
+msgstr "英語にはone/otherがあり、ポーランド語にはone/few/many/otherがあります。厳密な0のバリアントは「0」よりも読みやすくなります。ポーランド語でcountを1, 2, 5, 22と変化させて、カテゴリの切り替わりを確認してください。"
+
+#: apps/playground/src/app/app.html:242
+msgctxt "Section heading: ordinal numbers (1st, 2nd, 3rd …), not cardinal counts"
+msgid "Ordinals"
+msgstr "序数"
+
+#: apps/playground/src/app/app.html:249
+msgctxt "Card title. 'Ordinal' = ranking forms (1st/2nd/3rd); 'categories' = the CLDR plural categories"
+msgid "Ordinal categories"
+msgstr "序数カテゴリ"
+
+#: apps/playground/src/app/app.html:253
+msgctxt "Card body. st/nd/rd/th are the English ordinal suffixes; one/two/few/other are CLDR category names (keep in English); EN/PL/DE = English/Polish/German; '{n}.' shows the number followed by a period"
+msgid "EN uses st/nd/rd/th (one/two/few/other); PL and DE collapse to a plain '{n}.'."
+msgstr "英語ではst/nd/rd/th（one/two/few/other）を使用しますが、ポーランド語とドイツ語では単純な「{n}.」に集約されます。"
+
+#: apps/playground/src/app/app.html:288
+msgctxt "Section heading. 'select' is the ICU MessageFormat 'select' construct (pick a variant by gender) — not a dropdown and not the verb 'to select'"
+msgid "Gender select"
+msgstr "性別選択"
+
+#: apps/playground/src/app/app.html:295
+msgctxt "Card title. 'Select' = the ICU select construct (choose a variant by value), not a dropdown; 'a string' = a text value"
+msgid "Select on a string"
+msgstr "文字列での選択"
+
+#: apps/playground/src/app/app.html:299
+msgctxt "Card body. 'pronoun' = he/she/they; 'gendered past-tense verb' = a verb form that changes with gender (as in Polish); 'count × gender' = the combination of both; 'cross-product' = every combination"
+msgid "EN swaps the pronoun; PL swaps the gendered past-tense verb. The second line combines count × gender — a cross-product that differs per language."
+msgstr "英語では代名詞が入れ替わり、ポーランド語では性別に応じた過去形動詞が入れ替わります。2行目はcountとgenderを組み合わせたもので、言語によって異なる直積となります。"
+
+#: apps/playground/src/app/app.html:322
+msgctxt "Section heading: locale-aware number formatting (digit-group separators)"
+msgid "Number formatting"
+msgstr "数値の書式設定"
+
+#: apps/playground/src/app/app.html:329
+msgctxt "Card title. 'grouping' = digit-group separators in numbers (1,000 vs 1.000 vs 1 000); 'Locale-aware' = follows the active language"
+msgid "Locale-aware grouping"
+msgstr "ロケール対応のグループ化"
+
+#: apps/playground/src/app/app.html:333
+msgctxt "Card body. ':number' is an ICU formatter token (keep verbatim); en/de/pl = English/German/Polish; the figures show how each locale groups digits"
+msgid "The :number formatter follows the active locale: en 1,234,567 · de 1.234.567 · pl 1 234 567."
+msgstr ":numberフォーマッターはアクティブなロケールに従います: 英語 1,234,567 · ドイツ語 1.234.567 · ポーランド語 1 234 567。"
+
+#: apps/playground/src/app/app.html:344
+msgctxt "Section heading. 'Context' = the translation disambiguation feature (gettext msgctxt); 'homonyms' = words spelled the same but meaning different things"
+msgid "Context (homonyms)"
+msgstr "コンテキスト（同音異義語）"
+
+#: apps/playground/src/app/app.html:351
+msgctxt "Card title about homonyms / disambiguation"
+msgid "Same word, different meaning"
+msgstr "同じ単語、異なる意味"
+
+#: apps/playground/src/app/app.html:354
+msgctxt "Card body. 'context' is the ng-linguo option name (keep verbatim); 'key' = lookup key; 'gettext msgctxt' is a technical term (keep); 'note for translators' = a hint; 'sense' = meaning"
+msgid "context is part of the key (gettext msgctxt) and doubles as a note for translators. Switch to Polish to see each sense diverge."
+msgstr "contextはキーの一部（gettext msgctxt）であり、翻訳者への注釈としても機能します。ポーランド語に切り替えて、それぞれの意味がどのように分岐するかを確認してください。"
+
+#: apps/playground/src/app/app.html:361
+msgctxt "audio player"
+msgid "Play"
+msgstr "再生"
+
+#: apps/playground/src/app/app.html:361
+msgctxt "game"
+msgid "Play"
+msgstr "プレイ"
+
+#: apps/playground/src/app/app.html:364
+msgctxt "direction"
+msgid "Right"
+msgstr "右"
+
+#: apps/playground/src/app/app.html:364
+msgctxt "correct"
+msgid "Right"
+msgstr "正しい"
+
+#: apps/playground/src/app/app.html:368
+msgctxt "sequence"
+msgid "Order"
+msgstr "順序"
+
+#: apps/playground/src/app/app.html:368
+msgctxt "purchase"
+msgid "Order"
+msgstr "注文"
+
+#: apps/playground/src/app/app.html:372
+msgctxt "no cost"
+msgid "Free"
+msgstr "無料"
+
+#: apps/playground/src/app/app.html:372
+msgctxt "available"
+msgid "Free"
+msgstr "空き"
+
+#: apps/playground/src/app/app.html:380
+msgctxt "Section heading. 'Rich text' = text with links/emphasis; 'slot tags' = the [name] bracket placeholders ng-linguo uses in translations"
+msgid "Rich text (slot tags)"
+msgstr "リッチテキスト（スロットタグ）"
+
+#: apps/playground/src/app/app.html:387
+msgctxt "Card title. 'emphasis' = bold/italic styling; 'dictionary' = the JSON translation file. The point: no HTML appears in translation files"
+msgid "Links and emphasis without HTML in the dictionary"
+msgstr "辞書にHTMLを含まないリンクと強調"
+
+#: apps/playground/src/app/app.html:391
+msgctxt "Card body. 'named slots' = the [name] bracket placeholders; keep 'ng-template tFor' verbatim; 'literal bracket' = a real [ character; 'XSS' is the web-security term (keep); 'zero by construction' = impossible by design. [[name] shows an escaped literal bracket — keep the doubled brackets"
+msgid "Translators see named slots like [[name]…[[/name] — each binds to your own ng-template tFor, with no predefined HTML. Need a literal bracket in your prose? Double the opening one. Translator content is never inserted as HTML; XSS surface is zero by construction."
+msgstr "翻訳者は[[name]…[[/name]のような名前付きスロットを目にします。これらはそれぞれ独自のng-template tForにバインドされ、事前に定義されたHTMLはありません。文章中にリテラルの角括弧が必要な場合は、開始括弧を二重にしてください。翻訳者のコンテンツがHTMLとして挿入されることはなく、XSSの攻撃対象は設計上ゼロです。"
+
+#: apps/playground/src/app/app.html:397
+msgctxt "Onboarding hint. [docs] wraps a link to the documentation — translate the wrapped word too and keep the [docs] tags around it"
+msgid "Read the [docs]documentation[/docs] to get started"
+msgstr "開始するには、[docs]ドキュメント[/docs]をお読みください。"
+
+#: apps/playground/src/app/app.html:405
+msgctxt "Consent line shown before sign-up. [terms] wraps a link; 'Terms of Service' is the standard name of the legal agreement — use the conventional target-language equivalent"
+msgid "By continuing you agree to our [terms]Terms of Service[/terms]"
+msgstr "続行することで、当社の[terms]利用規約[/terms]に同意するものとします"
+
+#: apps/playground/src/app/app.html:413
+msgctxt "Warning before a destructive, irreversible action. [warn] wraps the emphasized lead word 'Warning:'"
+msgid "[warn]Warning:[/warn] this action cannot be undone"
+msgstr "[warn]警告:[/warn] この操作は元に戻せません"
+
+#: apps/playground/src/app/app.html:422
+msgctxt "Demo of ng-linguo's slot syntax and its bracket escape. 'Escaped' is the programming sense (made literal via the [[ escape), not fleeing; 'stays literal' = shown as plain text; 'slot' = a fillable [name] region. [[b]bold[[/b] is escaped literal text, [b]this[/b] is a real slot — keep both forms exactly"
+msgid "Escaped [[b]bold[[/b] stays literal — [b]this[/b] is a slot"
+msgstr "エスケープされた[[b]bold[[/b]はリテラルとして表示されます — [b]これは[/b]スロットです"
+
+#: apps/playground/src/app/app.html:433
+msgctxt "Consent line with a nested slot. [link] wraps a link to the Terms; [b] emphasizes a word inside it. 'Terms and Conditions' is the standard legal-document name — use the conventional target-language equivalent"
+msgid "Agree to our [link]Terms and [b]Conditions[/b][/link]"
+msgstr "当社の[link]利用[b]規約[/b][/link]に同意する"
+
+#: apps/playground/src/app/app.html:450
+msgctxt "Section heading. 'ESLint' is a tool name — keep verbatim; 'a11y' is the numeronym for accessibility (keep, or use the target word for accessibility)"
+msgid "ESLint & a11y"
+msgstr "ESLintとa11y"
+
+#: apps/playground/src/app/app.html:457
+msgctxt "Card title (colloquial). 'linter' = ESLint; 'keep the linter happy' = satisfy the lint rule; '[t]' is a code symbol (keep); 'empty elements' = elements with no text content"
+msgid "Keep the linter happy with empty [t] elements"
+msgstr "空の[t]要素でリンターを満足させる"
+
+#: apps/playground/src/app/app.html:461
+msgctxt "Card body. Keep verbatim: @angular-eslint/template/elements-content, [t]. 'a11y' = accessibility; 'markup' = HTML; 'fallback' = the default shown before translations load; 'the hero' = the large heading at the top of the page"
+msgid "The a11y rule @angular-eslint/template/elements-content flags empty headings, anchors, and buttons. A [t] element fills its text at runtime, so the source string can move out of the markup entirely — the headings on this page are empty [t] elements; only the hero keeps its text as a fallback."
+msgstr "a11yルール@angular-eslint/template/elements-contentは、空の見出し、アンカー、ボタンにフラグを立てます。[t]要素は実行時にテキストを埋めるため、ソース文字列をマークアップから完全に移動させることができます。このページの見出しは空の[t]要素であり、ヒーローだけがフォールバックとしてテキストを保持しています。"
+
+#: apps/playground/src/app/app.html:471
+msgctxt "Section heading: translating the app automatically using an AI / LLM"
+msgid "Translating with AI"
+msgstr "AIによる翻訳"
+
+#: apps/playground/src/app/app.html:478
+msgctxt "Card title. 'source string' = the original English text; 'catalog' = the translation file (.po)"
+msgid "From source string to translated catalog"
+msgstr "ソース文字列から翻訳済みカタログへ"
+
+#: apps/playground/src/app/app.html:482
+msgctxt "Card body. Keep verbatim: extract CLI, gettext, .po, JSON, ng-linguo, SDK, API key, translator. 'catalogs' = translation files; 'chat model' = an LLM; 'merges the reply' = applies the response; 'clipboard copy/paste' = manual copying"
+msgid "The extract CLI keeps gettext .po catalogs and compiles them to runtime JSON. Translate by copying a prompt into any chat model, or fully automatically: point translator at a module that calls your own AI provider — ng-linguo writes the prompt and merges the reply, you keep the SDK and the API key. Omit translator and translation stays a clipboard copy/paste."
+msgstr "extract CLIはgettext .poカタログを保持し、実行時JSONにコンパイルします。翻訳は、プロンプトを任意のチャットモデルにコピーするか、完全に自動で行うことができます。translatorを独自のAIプロバイダーを呼び出すモジュールに向けると、ng-linguoがプロンプトを作成し応答をマージします。SDKとAPIキーはご自身で管理します。translatorを省略すると、翻訳はクリップボードでのコピー/ペーストになります。"
+
+#: apps/playground/src/app/app.html:491
+msgctxt "Page footer. 'ng-linguo' is the product name (keep verbatim); 'living documentation' = documentation that is also a working demo"
+msgid "Built with ng-linguo · this playground is also living documentation."
+msgstr "ng-linguoで構築 · このプレイグラウンドは生きたドキュメントでもあります。"
+
+#: apps/playground/src/app/app.ts:51
+msgid "Setup"
+msgstr "セットアップ"
+
+#: apps/playground/src/app/app.ts:52
+msgid "The t pipe"
+msgstr "tパイプ"
+
+#: apps/playground/src/app/app.ts:53
+msgid "The [t] directive"
+msgstr "[t]ディレクティブ"
+
+#: apps/playground/src/app/app.ts:55
+msgid "Plurals"
+msgstr "複数形"
+
+#: apps/playground/src/app/app.ts:56
+msgid "Ordinals"
+msgstr "序数"
+
+#: apps/playground/src/app/app.ts:57
+msgid "Gender select"
+msgstr "性別選択"
+
+#: apps/playground/src/app/app.ts:58
+msgid "Number formatting"
+msgstr "数値の書式設定"
+
+#: apps/playground/src/app/app.ts:59
+msgid "Context (homonyms)"
+msgstr "コンテキスト（同音異義語）"
+
+#: apps/playground/src/app/app.ts:60
+msgid "Rich text (slots)"
+msgstr "リッチテキスト（スロット）"
+
+#: apps/playground/src/app/app.ts:61
+msgid "ESLint & a11y"
+msgstr "ESLintとa11y"
+
+#: apps/playground/src/app/app.ts:62
+msgid "Translating with AI"
+msgstr "AIによる翻訳"
+
+#: apps/playground/src/app/app.ts:80
+msgid ".input {$count :number} .match $count one {{{$count} file}} * {{{$count} files}}"
+msgstr ".input {$count :number} .match $count * {{{$count} ファイル}}"
+
+#: apps/playground/src/app/app.ts:83
+msgid ".input {$count :number} .match $count one {{{$count} item in your cart}} * {{{$count} items in your cart}}"
+msgstr ".input {$count :number} .match $count * {{カートに{$count}個の商品}}"
+
+#: apps/playground/src/app/app.ts:88
+msgid ".input {$count :number} .match $count 0 {{No new messages}} one {{{$count} new message}} * {{{$count} new messages}}"
+msgstr ".input {$count :number} .match $count 0 {{新しいメッセージはありません}} * {{{$count}件の新しいメッセージ}}"
+
+#: apps/playground/src/app/app.ts:93
+msgid ".input {$place :number select=ordinal} .match $place one {{You finished {$place}st}} two {{You finished {$place}nd}} few {{You finished {$place}rd}} * {{You finished {$place}th}}"
+msgstr ".input {$place :number select=ordinal} .match $place * {{あなたは{$place}位でフィニッシュしました}}"
+
+#: apps/playground/src/app/app.ts:98
+msgid ".input {$gender :string} .match $gender female {{She invited you}} male {{He invited you}} * {{They invited you}}"
+msgstr ".input {$gender :string} .match $gender female {{彼女があなたを招待しました}} male {{彼があなたを招待しました}} * {{招待されました}}"
+
+#: apps/playground/src/app/app.ts:104
+msgid ".input {$count :number} .input {$gender :string} .match $count $gender one female {{She has {$count} follower}} one male {{He has {$count} follower}} * female {{She has {$count} followers}} * male {{He has {$count} followers}} * * {{They have {$count} followers}}"
+msgstr ".input {$count :number} .input {$gender :string} .match $count $gender * female {{彼女には{$count}人のフォロワーがいます}} * male {{彼には{$count}人のフォロワーがいます}} * * {{{$count}人のフォロワーがいます}}"
+
+#: apps/playground/src/app/app.ts:109
+msgid "This city has {$n :number} residents"
+msgstr "この都市には{$n}人の住民がいます"
+
+#: apps/playground/src/app/app.ts:112
+msgid "Click the button to download {$file}"
+msgstr "ボタンをクリックして{$file}をダウンロード"
+
+#: apps/playground/src/app/app.ts:114
+msgid "Hello {$name}!"
+msgstr "こんにちは、{$name}さん！"
+
+#: apps/playground/src/app/components/code-block.component.ts:40
+msgid "Copied"
+msgstr "コピーしました"
+
+#: apps/playground/src/app/components/code-block.component.ts:40
+msgid "Copy"
+msgstr "コピー"
+
+#: apps/playground/src/app/components/example-card.component.ts:36
+msgid "Preview"
+msgstr "プレビュー"

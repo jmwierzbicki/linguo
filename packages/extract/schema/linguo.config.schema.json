@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ng-linguo.dev/schema/linguo.config.schema.json",
+  "title": "ng-linguo extract configuration",
+  "description": "Configuration for the @ng-linguo/extract CLI (linguo-extract). Paths are resolved relative to this file's directory.",
+  "type": "object",
+  "required": ["locales"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Path or URL to this JSON schema, enabling editor autocomplete and validation."
+    },
+    "locales": {
+      "type": "array",
+      "description": "Languages to generate catalogs for. The first is usually your source language. Use BCP-47 codes, e.g. \"en\", \"pl\", \"de\".",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "examples": [["en", "pl", "de"]]
+    },
+    "sourceLocale": {
+      "type": "string",
+      "description": "The language your source strings are authored in. Its catalog is never flagged as missing.",
+      "default": "en"
+    },
+    "src": {
+      "type": "string",
+      "description": "Directory scanned for translatable strings (the t pipe/directive and t() calls).",
+      "default": "src"
+    },
+    "catalogs": {
+      "type": "string",
+      "description": "Directory holding the editable <locale>.po translation catalogs.",
+      "default": "i18n"
+    },
+    "output": {
+      "type": "string",
+      "description": "Directory for the compiled runtime <locale>.json dictionaries your app loads.",
+      "default": "src/assets/i18n"
+    },
+    "referenceBase": {
+      "type": "string",
+      "description": "How #: source references are written in the .po files: 'config' (relative to this file — portable, gettext-style) or 'workspace' (relative to the cwd — clickable in the terminal).",
+      "enum": ["config", "workspace"],
+      "default": "config"
+    },
+    "translator": {
+      "type": "string",
+      "description": "Path to a module exporting a translate() function for automatic AI translation (linguo-extract translate). Omit to translate via the clipboard instead.",
+      "examples": ["./linguo.translator.mjs"]
+    }
+  }
+}

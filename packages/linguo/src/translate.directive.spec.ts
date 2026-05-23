@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MESSAGE_FORMATTER } from './message-formatter';
 import { provideTranslate } from './provide-translate';
-import { TranslateDirective, TranslatePlaceholder } from './translate.directive';
+import { TranslateDirective, TranslateSlot } from './translate.directive';
 import { TranslateStore } from './translate.store';
 import type { Translations } from './types';
 
@@ -17,7 +17,7 @@ const SOURCE = 'Read the [docs]documentation[/docs] now';
       </ng-template>
     </p>
   `,
-  imports: [TranslateDirective, TranslatePlaceholder],
+  imports: [TranslateDirective, TranslateSlot],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class HostComponent {}
@@ -38,7 +38,7 @@ function setup(loader = { load: (lang: string) => Promise.resolve(catalog[lang] 
 }
 
 describe('TranslateDirective', () => {
-  it('renders the message text and the placeholder content in order', async () => {
+  it('renders the message text and the slot content in order', async () => {
     const { fixture, store } = setup();
     await store.setLang('en');
     fixture.detectChanges();
@@ -46,7 +46,7 @@ describe('TranslateDirective', () => {
     expect(p.textContent?.replace(/\s+/g, ' ').trim()).toBe('Read the documentation now');
   });
 
-  it('binds the placeholder inner text to the matching tFor template', async () => {
+  it('binds the slot inner text to the matching tFor template', async () => {
     const { fixture, store } = setup();
     await store.setLang('en');
     fixture.detectChanges();

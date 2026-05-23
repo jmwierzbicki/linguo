@@ -25,6 +25,11 @@
             "input": "packages/extract/src/lib",
             "glob": "*.txt",
             "output": "src/lib"
+          },
+          {
+            "input": "packages/extract/schema",
+            "glob": "linguo.config.schema.json",
+            "output": "."
           }
         ]
       }
