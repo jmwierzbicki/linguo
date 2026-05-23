@@ -169,7 +169,10 @@ export function extractMessages(files: readonly SourceFile[]): ExtractedMessage[
       found.push({
         index,
         keyId: normalizeMessage(unescapeJs(key)),
-        context: contextMatch ? unescapeJs(contextMatch[2] ?? '').trim() : '',
+        // Collapse the context like the key: Angular collapses interpolation
+        // whitespace at runtime, so a multi-line context arrives single-spaced
+        // there — the catalog key must match (CLAUDE.md §5.2).
+        context: contextMatch ? normalizeMessage(unescapeJs(contextMatch[2] ?? '')) : '',
       });
     };
 
@@ -203,7 +206,7 @@ export function extractMessages(files: readonly SourceFile[]): ExtractedMessage[
       found.push({
         index: tagMatch.index,
         keyId: normalizeMessage(messageMatch[1] ?? ''),
-        context: contextMatch ? (contextMatch[1]?.trim() ?? '') : '',
+        context: contextMatch ? normalizeMessage(contextMatch[1] ?? '') : '',
       });
     }
 

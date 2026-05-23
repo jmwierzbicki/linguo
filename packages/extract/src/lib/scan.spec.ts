@@ -19,9 +19,12 @@ describe('extractMessages', () => {
         content:
           `<p>{{ 'Heads up: the t pipe is impure, so Angular re-checks it\n` +
           `      on every pass.' | t : {\n` +
-          `      context: 'Note under the pipe example' } }}</p>`,
+          `      context: 'Note under the\n` +
+          `      pipe example' } }}</p>`,
       },
     ]);
+    // Both the key and the context are collapsed: Angular collapses interpolation
+    // whitespace at runtime, so the catalog must store the single-spaced form.
     expect(result).toEqual([
       {
         keyId: 'Heads up: the t pipe is impure, so Angular re-checks it on every pass.',
