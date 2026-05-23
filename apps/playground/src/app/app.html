@@ -53,19 +53,26 @@
        Sidebar table of contents.
        ══════════════════════════════════════════════════════════════════════ -->
   <aside class="hidden w-52 shrink-0 lg:block">
-    <nav class="sticky top-20 space-y-1">
+    <nav class="sticky top-20 space-y-5">
       <p
-        class="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500"
+        class="px-3 text-xs font-semibold uppercase tracking-wider text-slate-500"
         t="On this page"
         tContext="Heading above the sidebar table-of-contents navigation links"
       ></p>
-      @for (section of sections; track section.id) {
-      <a
-        [href]="'#' + section.id"
-        class="block rounded-md px-3 py-1.5 text-sm text-slate-400 transition hover:bg-slate-900 hover:text-slate-100"
-      >
-        {{ section.label | t }}
-      </a>
+      @for (group of sectionGroups; track group.id) {
+      <div class="space-y-1">
+        <p class="px-3 pb-1 text-xs font-medium uppercase tracking-wider text-indigo-400">
+          {{ group.title | t }}
+        </p>
+        @for (section of group.sections; track section.id) {
+        <a
+          [href]="'#' + section.id"
+          class="block rounded-md px-3 py-1.5 text-sm text-slate-400 transition hover:bg-slate-900 hover:text-slate-100"
+        >
+          {{ section.label | t }}
+        </a>
+        }
+      </div>
       }
     </nav>
   </aside>
@@ -86,406 +93,537 @@
       </h1>
       <p
         class="mt-4 max-w-2xl text-lg leading-relaxed text-slate-400"
-        t="ng-linguo is a complete internationalization solution for Angular built on a SignalStore. Reads are signals, writes are store methods, and translators never see a line of HTML. Flip the language switcher above and watch every example below re-render reactively."
-        tContext="Hero subheading (marketing prose). Keep the product/tech names verbatim: 'ng-linguo', 'Angular', 'SignalStore', 'HTML'. 'signals'/'store methods' are Angular Signals concepts; 'reads'/'writes' are data access, not literal reading/writing"
+        t="ng-linguo is a complete internationalization (i18n) toolkit for Angular, built on a SignalStore. You read translations as signals, change the language through store methods, and your translators never touch a line of HTML. Use the language switcher above and watch every example on this page update instantly."
+        tContext="Hero subheading (marketing prose). Keep the product/tech names verbatim: 'ng-linguo', 'Angular', 'SignalStore', 'HTML', 'i18n'. 'signals'/'store methods' are Angular Signals concepts; 'read translations'/'change the language' describe data access, not literal reading/writing"
       ></p>
+
+      <!-- Value-proposition highlights -->
+      <dl class="mt-8 grid gap-4 sm:grid-cols-2">
+        <div class="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
+          <dt
+            class="font-semibold text-slate-100"
+            t="English is the key"
+            tContext="Highlight title. Means: the English source text itself is used as the translation lookup key (no separate key names)"
+          ></dt>
+          <dd
+            class="mt-1 text-sm leading-relaxed text-slate-400"
+            t="Write real sentences in your components — that text is the lookup key. No dotted key paths to invent or keep in sync, and an AI model always sees full, meaningful context."
+            tContext="Highlight body. 'lookup key' = the value used to find a translation; 'dotted key paths' = names like home.header.title used by other i18n libraries; 'AI model' = an LLM doing the translation"
+          ></dd>
+        </div>
+        <div class="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
+          <dt
+            class="font-semibold text-slate-100"
+            t="Translators never see HTML"
+            tContext="Highlight title: translation files contain plain text only, no HTML markup"
+          ></dt>
+          <dd
+            class="mt-1 text-sm leading-relaxed text-slate-400"
+            t="Named slots bind to your own templates, so links and bold text render as real Angular while the file stays plain text. Cross-site scripting is impossible by design."
+            tContext="Highlight body. 'Named slots' = the [name] bracket placeholders; 'Cross-site scripting' = the XSS security vulnerability"
+          ></dd>
+        </div>
+        <div class="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
+          <dt
+            class="font-semibold text-slate-100"
+            t="Real grammar, every language"
+            tContext="Highlight title: correct grammatical forms (plurals, gender, etc.) in each language"
+          ></dt>
+          <dd
+            class="mt-1 text-sm leading-relaxed text-slate-400"
+            t="ICU MessageFormat 2 handles plurals, ordinals, gender, and locale-aware numbers — Polish gets four plural forms, English gets two, from a single message."
+            tContext="Highlight body. Keep 'ICU MessageFormat 2' verbatim (a standard). 'locale-aware numbers' = numbers formatted per language"
+          ></dd>
+        </div>
+        <div class="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
+          <dt
+            class="font-semibold text-slate-100"
+            t="Additive extraction"
+            tContext="Highlight title. 'Additive' = re-running the extractor adds to your files without overwriting existing translations"
+          ></dt>
+          <dd
+            class="mt-1 text-sm leading-relaxed text-slate-400"
+            t="Re-run the extractor any time: new and changed strings merge into your catalogs while every existing translation is kept."
+            tContext="Highlight body. 'extractor' = the CLI that scans source for strings; 'catalogs' = the per-language translation files"
+          ></dd>
+        </div>
+        <div class="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
+          <dt
+            class="font-semibold text-slate-100"
+            t="Translate with AI"
+            tContext="Highlight title: translating the app using an AI / LLM"
+          ></dt>
+          <dd
+            class="mt-1 text-sm leading-relaxed text-slate-400"
+            t="A guided command-line tool copies a prompt for any chat model, or calls your own AI provider. Adding a whole new language is a single command."
+            tContext="Highlight body. 'guided command-line tool' = the interactive CLI; 'chat model' = an LLM such as ChatGPT/Gemini/Claude"
+          ></dd>
+        </div>
+        <div class="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
+          <dt
+            class="font-semibold text-slate-100"
+            t="Zoneless, SSR-safe, tree-shakeable"
+            tContext="Highlight title. Keep 'SSR' (server-side rendering) and 'tree-shakeable' (unused code is dropped from the bundle); 'Zoneless' = works without Angular's zone.js"
+          ></dt>
+          <dd
+            class="mt-1 text-sm leading-relaxed text-slate-400"
+            t="Reactivity is signals all the way down. No zone.js, it renders on the server, and optional features ship only when you import them."
+            tContext="Highlight body. Keep 'signals' (Angular Signals) and 'zone.js' (Angular library name) verbatim; 'renders on the server' = supports server-side rendering"
+          ></dd>
+        </div>
+      </dl>
     </section>
 
-    <div class="space-y-12">
-      <!-- Setup ────────────────────────────────────────────────────────────── -->
-      <section id="setup" class="scroll-mt-20">
+    <div class="space-y-16">
+      <!-- ═══ Group: Getting started ═══════════════════════════════════════════ -->
+      <div>
         <h2
-          class="mb-4 text-2xl font-semibold text-white"
-          t="Setup"
-          tContext="Section heading: initial setup / installation of the library"
+          class="mb-6 text-sm font-semibold uppercase tracking-wider text-indigo-400"
+          t="Getting started"
+          tContext="Section-group label for the first group of examples: installing the library and the three basic ways to translate (the t pipe, the [t] directive, and injectTranslate)"
         ></h2>
-        <app-example-card
-          [title]="
-            'Bootstrap the store'
-              | t: { context: 'Card title. \'store\' = the ng-linguo SignalStore (a noun); \'Bootstrap\' = set up / initialize' }
-          "
-          [description]="
-            'provideTranslate() wires up the store; it never loads automatically — restoreLang() is the explicit kick-off. Dictionaries are plain JSON keyed by source string.'
-              | t: { context: 'Card body (developer-docs tone). Keep API names verbatim: provideTranslate(), restoreLang(). \'store\' = the SignalStore; \'loads\' = fetches translations; \'Dictionaries\' = the JSON translation files; \'keyed by source string\' = the English text is the lookup key' }
-          "
-          [tabs]="setupTabs"
-          [hasPreview]="false"
-        />
-      </section>
+        <div class="space-y-12">
+          <!-- Setup ──────────────────────────────────────────────────────────── -->
+          <section id="setup" class="scroll-mt-20">
+            <h3
+              class="mb-4 text-2xl font-semibold text-white"
+              t="Setup"
+              tContext="Section heading: initial setup / installation of the library"
+            ></h3>
+            <app-example-card
+              [title]="
+                'Set up the translation store'
+                  | t: { context: 'Card title. \'translation store\' = the ng-linguo SignalStore that holds translations (a noun)' }
+              "
+              [description]="
+                'Three steps to a translated app: (1) register the store with provideTranslate() — it never fetches on its own; (2) load a language at startup with restoreLang(), which picks persisted → browser → default; (3) translate with the pipe, directive, or injectTranslate(). Translation files are plain JSON keyed by the original English text — generate them with the CLI shown under Tooling & workflow below.'
+                  | t: { context: 'Card body (developer-docs tone, step-by-step). Keep API names verbatim: provideTranslate(), restoreLang(), injectTranslate(). \'persisted → browser → default\' is the order restoreLang() chooses the startup language in; \'keyed by\' = uses as the lookup key; \'CLI\' = the command-line tool' }
+              "
+              [tabs]="setupTabs"
+              [hasPreview]="false"
+            />
+          </section>
 
-      <!-- t pipe ───────────────────────────────────────────────────────────── -->
-      <section id="pipe" class="scroll-mt-20">
-        <h2
-          class="mb-4 text-2xl font-semibold text-white"
-          t="The [code]t[/code] pipe"
-          tContext="Section heading. 'pipe' is the Angular template-pipe concept — keep the technical term; [code] wraps the code symbol 't'"
-        >
-          <ng-template tFor="code" let-text
-            ><code class="text-indigo-300">{{text}}</code></ng-template
-          >
-        </h2>
-        <app-example-card
-          [title]="
-            'Translate in the template' | t: { context: 'Card title. \'template\' = the Angular HTML template' }
-          "
-          [description]="
-            'The source English string is the key. With no translation it falls through to the source, so the UI is never blank.'
-              | t: { context: 'Card body. \'key\' = the lookup key; \'falls through to the source\' = shows the original English when no translation exists; \'blank\' = empty' }
-          "
-          [tabs]="pipeTabs"
-        >
-          <p class="text-slate-200">{{ 'He was driving incredibly fast!' | t }}</p>
-        </app-example-card>
-      </section>
-
-      <!-- directive ──────────────────────────────────────────────────────────── -->
-      <section id="directive" class="scroll-mt-20">
-        <h2
-          class="mb-4 text-2xl font-semibold text-white"
-          t="The [code][[t][/code] directive"
-          tContext="Section heading. 'directive' is the Angular directive concept — keep the technical term; [code] wraps the code symbol '[t]'"
-        >
-          <ng-template tFor="code" let-text
-            ><code class="text-indigo-300">{{text}}</code></ng-template
-          >
-        </h2>
-        <app-example-card
-          [title]="
-            'Translate an element' | t: { context: 'Card title. \'element\' = an HTML / DOM element' }
-          "
-          [description]="
-            'Reads through to the store\'s signals — once a dictionary loads, the directive re-renders with no subscription bookkeeping.'
-              | t: { context: 'Card body. \'signals\' = Angular Signals; \'dictionary\' = the JSON translation file; \'directive\' = the Angular [t] directive; \'subscription bookkeeping\' = manually managing RxJS subscriptions' }
-          "
-          [tabs]="directiveTabs"
-        >
-          <p class="text-slate-200" t="He was driving incredibly fast!"></p>
-        </app-example-card>
-      </section>
-
-      <!-- injectTranslate ──────────────────────────────────────────────────── -->
-      <section id="inject" class="scroll-mt-20">
-        <h2 class="mb-4 text-2xl font-semibold text-white">
-          <code class="text-indigo-300">injectTranslate()</code>
-        </h2>
-        <app-example-card
-          [title]="
-            'Translate in TypeScript' | t: { context: 'Card title. \'TypeScript\' is the programming language name — keep verbatim' }
-          "
-          [description]="
-            'The pipe\'s counterpart for component code. Read it inside a computed() and it stays reactive to both params and the active language.'
-              | t: { context: 'Card body. \'the pipe\' = the Angular t pipe; \'component code\' = TypeScript class code; keep computed() verbatim; \'params\' = the ICU parameters; \'reactive\' = updates automatically' }
-          "
-          [tabs]="injectTabs"
-        >
-          <div class="flex flex-col gap-3">
-            <label class="text-sm text-slate-400">
-              name =
-              <input
-                class="ml-2 rounded-md border border-slate-700 bg-slate-950 px-2 py-1 text-slate-100"
-                [value]="name()"
-                (input)="name.set($any($event.target).value)"
-              />
-            </label>
-            <p class="text-slate-200">{{ greetingFromTs() }}</p>
-          </div>
-        </app-example-card>
-      </section>
-
-      <!-- Plurals ───────────────────────────────────────────────────────────── -->
-      <section id="plurals" class="scroll-mt-20">
-        <h2
-          class="mb-4 text-2xl font-semibold text-white"
-          t="Plurals"
-          tContext="Section heading: grammatical plural forms (one file / many files)"
-        ></h2>
-        <app-example-card
-          [title]="
-            'Cardinal plurals across languages'
-              | t: { context: 'Card title. \'Cardinal plurals\' = counting forms (1 file / 2 files), as opposed to ordinals' }
-          "
-          [description]="
-            'EN has one/other; PL has one/few/many/other; an exact 0 variant reads better than \'0\'. Walk count through 1, 2, 5, 22 in Polish to see the category switch.'
-              | t: { context: 'Card body. EN/PL = English/Polish; one/few/many/other are CLDR plural-category names — keep them in English; \'count\' is a variable name (keep); \'category switch\' = the plural form changing' }
-          "
-          [tabs]="pluralTabs"
-        >
-          <div class="flex flex-col gap-4">
-            <div class="flex items-center gap-3">
-              <button
-                type="button"
-                (click)="addCount(-1)"
-                class="h-8 w-8 rounded-md border border-slate-700 text-slate-200 hover:bg-slate-800"
+          <!-- t pipe ───────────────────────────────────────────────────────────── -->
+          <section id="pipe" class="scroll-mt-20">
+            <h3
+              class="mb-4 text-2xl font-semibold text-white"
+              t="The [code]t[/code] pipe"
+              tContext="Section heading. 'pipe' is the Angular template-pipe concept — keep the technical term; [code] wraps the code symbol 't'"
+            >
+              <ng-template tFor="code" let-text
+                ><code class="text-indigo-300">{{text}}</code></ng-template
               >
-                −
-              </button>
-              <span class="w-24 text-center font-mono text-slate-300">count = {{ count() }}</span>
-              <button
-                type="button"
-                (click)="addCount(1)"
-                class="h-8 w-8 rounded-md border border-slate-700 text-slate-200 hover:bg-slate-800"
+            </h3>
+            <app-example-card
+              [title]="
+                'Translate in the template' | t: { context: 'Card title. \'template\' = the Angular HTML template' }
+              "
+              [description]="
+                'Write the English text straight into your template — that text is the lookup key. If a translation is missing, the pipe shows the English instead, so the screen is never empty.'
+                  | t: { context: 'Card body. \'lookup key\' = the value used to find a translation; the point is that the original English is both what you write and the key. \'never empty\' = no blank UI' }
+              "
+              [tabs]="pipeTabs"
+            >
+              <p class="text-slate-200">{{ 'Welcome back!' | t }}</p>
+            </app-example-card>
+            <p class="mt-3 text-sm leading-relaxed text-slate-500">
+              {{ 'Heads up: the t pipe is impure, so Angular re-checks it on every change-detection
+              pass (it memoizes to stay fast). For long lists or frequently-updated bindings, prefer
+              the [t] directive or injectTranslate() below — both do no work per pass.' | t : {
+              context: 'Note under the pipe example. \'impure\' is the Angular pipe term (a pure
+              pipe only re-runs when its input reference changes); \'change-detection pass\' is
+              Angular\'s render cycle; \'memoizes\' = caches the last result; keep the API names [t]
+              and injectTranslate() verbatim', } }}
+            </p>
+          </section>
+
+          <!-- directive ──────────────────────────────────────────────────────────── -->
+          <section id="directive" class="scroll-mt-20">
+            <h3
+              class="mb-4 text-2xl font-semibold text-white"
+              t="The [code][[t][/code] directive"
+              tContext="Section heading. 'directive' is the Angular directive concept — keep the technical term; [code] wraps the code symbol '[t]'"
+            >
+              <ng-template tFor="code" let-text
+                ><code class="text-indigo-300">{{text}}</code></ng-template
               >
-                +
-              </button>
-            </div>
-            <ul class="space-y-1 text-slate-200">
-              <li>{{ msgFiles | t: { params: { count: count() } } }}</li>
-              <li>{{ msgCartItems | t: { params: { count: count() } } }}</li>
-              <li>{{ msgUnread | t: { params: { count: count() } } }}</li>
-            </ul>
-          </div>
-        </app-example-card>
-      </section>
-
-      <!-- Ordinals ──────────────────────────────────────────────────────────── -->
-      <section id="ordinals" class="scroll-mt-20">
-        <h2
-          class="mb-4 text-2xl font-semibold text-white"
-          t="Ordinals"
-          tContext="Section heading: ordinal numbers (1st, 2nd, 3rd …), not cardinal counts"
-        ></h2>
-        <app-example-card
-          [title]="
-            'Ordinal categories'
-              | t: { context: 'Card title. \'Ordinal\' = ranking forms (1st/2nd/3rd); \'categories\' = the CLDR plural categories' }
-          "
-          [description]="
-            'EN uses st/nd/rd/th (one/two/few/other); PL and DE collapse to a plain \'{n}.\'.'
-              | t: { context: 'Card body. st/nd/rd/th are the English ordinal suffixes; one/two/few/other are CLDR category names (keep in English); EN/PL/DE = English/Polish/German; \'{n}.\' shows the number followed by a period' }
-          "
-          [tabs]="ordinalTabs"
-        >
-          <div class="flex flex-col gap-4">
-            <div class="flex items-center gap-3">
-              <button
-                type="button"
-                (click)="addPlace(-1)"
-                class="h-8 w-8 rounded-md border border-slate-700 text-slate-200 hover:bg-slate-800"
-              >
-                −
-              </button>
-              <span class="w-24 text-center font-mono text-slate-300">place = {{ place() }}</span>
-              <button
-                type="button"
-                (click)="addPlace(1)"
-                class="h-8 w-8 rounded-md border border-slate-700 text-slate-200 hover:bg-slate-800"
-              >
-                +
-              </button>
-            </div>
-            <div class="space-y-1 text-slate-200">
-              <!-- via the t pipe -->
-              <p>{{ msgRank | t: { params: { place: place() } } }}</p>
-              <!-- via the [t] directive ([t] bound, since the message contains { }) -->
-              <p [t]="msgRank" [tParams]="{ place: place() }"></p>
-            </div>
-          </div>
-        </app-example-card>
-      </section>
-
-      <!-- Gender ────────────────────────────────────────────────────────────── -->
-      <section id="gender" class="scroll-mt-20">
-        <h2
-          class="mb-4 text-2xl font-semibold text-white"
-          t="Gender select"
-          tContext="Section heading. 'select' is the ICU MessageFormat 'select' construct (pick a variant by gender) — not a dropdown and not the verb 'to select'"
-        ></h2>
-        <app-example-card
-          [title]="
-            'Select on a string'
-              | t: { context: 'Card title. \'Select\' = the ICU select construct (choose a variant by value), not a dropdown; \'a string\' = a text value' }
-          "
-          [description]="
-            'EN swaps the pronoun; PL swaps the gendered past-tense verb. The second line combines count × gender — a cross-product that differs per language.'
-              | t: { context: 'Card body. \'pronoun\' = he/she/they; \'gendered past-tense verb\' = a verb form that changes with gender (as in Polish); \'count × gender\' = the combination of both; \'cross-product\' = every combination' }
-          "
-          [tabs]="genderTabs"
-        >
-          <div class="flex flex-col gap-4">
-            <button
-              type="button"
-              (click)="toggleGender()"
-              class="w-fit rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-800"
+            </h3>
+            <app-example-card
+              [title]="
+                'Translate an element' | t: { context: 'Card title. \'element\' = an HTML / DOM element' }
+              "
+              [description]="
+                'Put the text on the element itself. The directive watches the store\'s signals for you, so when a translation file finishes loading the element updates on its own — no RxJS subscriptions to manage.'
+                  | t: { context: 'Card body. \'signals\' = Angular Signals; \'translation file\' = the JSON dictionary; \'directive\' = the Angular [t] directive; \'RxJS subscriptions to manage\' = manual subscribe/unsubscribe bookkeeping' }
+              "
+              [tabs]="directiveTabs"
             >
-              gender = {{ gender() }}
-            </button>
-            <div class="space-y-1 text-slate-200">
-              <p>{{ msgInvited | t: { params: { gender: gender() } } }}</p>
-              <p>{{ msgFollowers | t: { params: { count: count(), gender: gender() } } }}</p>
-            </div>
-          </div>
-        </app-example-card>
-      </section>
+              <p class="text-slate-200" t="Welcome back!"></p>
+            </app-example-card>
+          </section>
 
-      <!-- Numbers ───────────────────────────────────────────────────────────── -->
-      <section id="numbers" class="scroll-mt-20">
-        <h2
-          class="mb-4 text-2xl font-semibold text-white"
-          t="Number formatting"
-          tContext="Section heading: locale-aware number formatting (digit-group separators)"
-        ></h2>
-        <app-example-card
-          [title]="
-            'Locale-aware grouping'
-              | t: { context: 'Card title. \'grouping\' = digit-group separators in numbers (1,000 vs 1.000 vs 1 000); \'Locale-aware\' = follows the active language' }
-          "
-          [description]="
-            'The :number formatter follows the active locale: en 1,234,567 · de 1.234.567 · pl 1 234 567.'
-              | t: { context: 'Card body. \':number\' is an ICU formatter token (keep verbatim); en/de/pl = English/German/Polish; the figures show how each locale groups digits' }
-          "
-          [tabs]="numberTabs"
-        >
-          <p class="text-slate-200">{{ msgPopulation | t: { params: { n: 1234567 } } }}</p>
-        </app-example-card>
-      </section>
+          <!-- injectTranslate ──────────────────────────────────────────────────── -->
+          <section id="inject" class="scroll-mt-20">
+            <h3 class="mb-4 text-2xl font-semibold text-white">
+              <code class="text-indigo-300">injectTranslate()</code>
+            </h3>
+            <app-example-card
+              [title]="
+                'Translate in TypeScript' | t: { context: 'Card title. \'TypeScript\' is the programming language name — keep verbatim' }
+              "
+              [description]="
+                'The pipe\'s equivalent for TypeScript. Call it inside a computed() and the result updates automatically whenever your parameters or the active language change.'
+                  | t: { context: 'Card body. \'the pipe\' = the Angular t pipe; \'TypeScript\' = component class code; keep computed() verbatim; \'parameters\' = the ICU placeholder values; \'updates automatically\' = stays reactive' }
+              "
+              [tabs]="injectTabs"
+            >
+              <div class="flex flex-col gap-3">
+                <label class="text-sm text-slate-400">
+                  name =
+                  <input
+                    class="ml-2 rounded-md border border-slate-700 bg-slate-950 px-2 py-1 text-slate-100"
+                    [value]="name()"
+                    (input)="name.set($any($event.target).value)"
+                  />
+                </label>
+                <p class="text-slate-200">{{ greetingFromTs() }}</p>
+              </div>
+            </app-example-card>
+          </section>
+        </div>
+      </div>
 
-      <!-- Context ───────────────────────────────────────────────────────────── -->
-      <section id="context" class="scroll-mt-20">
+      <!-- ═══ Group: Plurals & formatting ══════════════════════════════════════ -->
+      <div>
         <h2
-          class="mb-4 text-2xl font-semibold text-white"
-          t="Context (homonyms)"
-          tContext="Section heading. 'Context' = the translation disambiguation feature (gettext msgctxt); 'homonyms' = words spelled the same but meaning different things"
+          class="mb-6 text-sm font-semibold uppercase tracking-wider text-indigo-400"
+          t="Plurals & formatting"
+          tContext="Section-group label: examples that rely on ICU MessageFormat — plurals, ordinals, gender selection, and number formatting"
         ></h2>
-        <app-example-card
-          [title]="
-            'Same word, different meaning' | t: { context: 'Card title about homonyms / disambiguation' }
-          "
-          [description]="
-            'context is part of the key (gettext msgctxt) and doubles as a note for translators. Switch to Polish to see each sense diverge.'
-              | t: { context: 'Card body. \'context\' is the ng-linguo option name (keep verbatim); \'key\' = lookup key; \'gettext msgctxt\' is a technical term (keep); \'note for translators\' = a hint; \'sense\' = meaning' }
-          "
-          [tabs]="contextTabs"
-        >
-          <ul class="space-y-1 text-slate-200">
-            <li>
-              {{ 'Play' | t: { context: 'audio player' } }} / {{ 'Play' | t: { context: 'game' } }}
-            </li>
-            <li>
-              {{ 'Right' | t: { context: 'direction' } }} / {{ 'Right' | t: { context: 'correct' }
-              }}
-            </li>
-            <li>
-              {{ 'Order' | t: { context: 'sequence' } }} / {{ 'Order' | t: { context: 'purchase' }
-              }}
-            </li>
-            <li>
-              {{ 'Free' | t: { context: 'no cost' } }} / {{ 'Free' | t: { context: 'available' } }}
-            </li>
-          </ul>
-        </app-example-card>
-      </section>
+        <div class="space-y-12">
+          <!-- Plurals ────────────────────────────────────────────────────────── -->
+          <section id="plurals" class="scroll-mt-20">
+            <h3
+              class="mb-4 text-2xl font-semibold text-white"
+              t="Plurals"
+              tContext="Section heading: grammatical plural forms (one file / many files)"
+            ></h3>
+            <app-example-card
+              [title]="
+                'Counting plurals across languages'
+                  | t: { context: 'Card title. \'Counting plurals\' = cardinal forms (1 file / 2 files), as opposed to ordinals like 1st/2nd' }
+              "
+              [description]="
+                'English has two forms (one/other); Polish has four (one/few/many/other). You can also give an exact \'0\' form when \'No new messages\' reads better than \'0 messages\'. Step count through 1, 2, 5, 22 in Polish to watch the form change.'
+                  | t: { context: 'Card body. one/few/many/other are CLDR plural-category names — keep them in English; \'count\' is a variable name (keep); the point is that different languages need a different number of plural forms' }
+              "
+              [tabs]="pluralTabs"
+            >
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                  <button
+                    type="button"
+                    (click)="addCount(-1)"
+                    class="h-8 w-8 rounded-md border border-slate-700 text-slate-200 hover:bg-slate-800"
+                  >
+                    −
+                  </button>
+                  <span class="w-24 text-center font-mono text-slate-300"
+                    >count = {{ count() }}</span
+                  >
+                  <button
+                    type="button"
+                    (click)="addCount(1)"
+                    class="h-8 w-8 rounded-md border border-slate-700 text-slate-200 hover:bg-slate-800"
+                  >
+                    +
+                  </button>
+                </div>
+                <ul class="space-y-1 text-slate-200">
+                  <li>{{ msgFiles | t: { params: { count: count() } } }}</li>
+                  <li>{{ msgCartItems | t: { params: { count: count() } } }}</li>
+                  <li>{{ msgUnread | t: { params: { count: count() } } }}</li>
+                </ul>
+              </div>
+            </app-example-card>
+          </section>
 
-      <!-- Slots ─────────────────────────────────────────────────────────────── -->
-      <section id="slots" class="scroll-mt-20">
+          <!-- Ordinals ──────────────────────────────────────────────────────────── -->
+          <section id="ordinals" class="scroll-mt-20">
+            <h3
+              class="mb-4 text-2xl font-semibold text-white"
+              t="Ordinals"
+              tContext="Section heading: ordinal numbers (1st, 2nd, 3rd …), not cardinal counts"
+            ></h3>
+            <app-example-card
+              [title]="
+                'Ordinal numbers (1st, 2nd, 3rd …)'
+                  | t: { context: 'Card title. \'Ordinal numbers\' = ranking forms; keep the 1st/2nd/3rd examples as English ordinal suffixes' }
+              "
+              [description]="
+                'English picks st/nd/rd/th depending on the number (one/two/few/other); Polish and German just add a period, like \'{n}.\'.'
+                  | t: { context: 'Card body. st/nd/rd/th are the English ordinal suffixes; one/two/few/other are CLDR category names (keep in English); EN/PL/DE meaning English/Polish/German; \'{n}.\' shows the number followed by a period' }
+              "
+              [tabs]="ordinalTabs"
+            >
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                  <button
+                    type="button"
+                    (click)="addPlace(-1)"
+                    class="h-8 w-8 rounded-md border border-slate-700 text-slate-200 hover:bg-slate-800"
+                  >
+                    −
+                  </button>
+                  <span class="w-24 text-center font-mono text-slate-300"
+                    >place = {{ place() }}</span
+                  >
+                  <button
+                    type="button"
+                    (click)="addPlace(1)"
+                    class="h-8 w-8 rounded-md border border-slate-700 text-slate-200 hover:bg-slate-800"
+                  >
+                    +
+                  </button>
+                </div>
+                <div class="space-y-1 text-slate-200">
+                  <!-- via the t pipe -->
+                  <p>{{ msgRank | t: { params: { place: place() } } }}</p>
+                  <!-- via the [t] directive ([t] bound, since the message contains { }) -->
+                  <p [t]="msgRank" [tParams]="{ place: place() }"></p>
+                </div>
+              </div>
+            </app-example-card>
+          </section>
+
+          <!-- Gender ────────────────────────────────────────────────────────────── -->
+          <section id="gender" class="scroll-mt-20">
+            <h3
+              class="mb-4 text-2xl font-semibold text-white"
+              t="Gender select"
+              tContext="Section heading. 'select' is the ICU MessageFormat 'select' construct (pick a variant by gender) — not a dropdown and not the verb 'to select'"
+            ></h3>
+            <app-example-card
+              [title]="
+                'Pick the wording by gender'
+                  | t: { context: 'Card title. This demonstrates the ICU \'select\' construct: choosing a different sentence depending on a value (here, gender)' }
+              "
+              [description]="
+                'English changes the pronoun (she/he/they); Polish changes the verb ending. The second line matches on count and gender at the same time — and every combination can read differently from one language to the next.'
+                  | t: { context: 'Card body. \'pronoun\' = she/he/they; \'verb ending\' = a verb form that changes with gender (as in Polish); \'matches on count and gender at the same time\' = one message that depends on two values at once' }
+              "
+              [tabs]="genderTabs"
+            >
+              <div class="flex flex-col gap-4">
+                <button
+                  type="button"
+                  (click)="toggleGender()"
+                  class="w-fit rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-800"
+                >
+                  gender = {{ gender() }}
+                </button>
+                <div class="space-y-1 text-slate-200">
+                  <p>{{ msgInvited | t: { params: { gender: gender() } } }}</p>
+                  <p>{{ msgFollowers | t: { params: { count: count(), gender: gender() } } }}</p>
+                </div>
+              </div>
+            </app-example-card>
+          </section>
+
+          <!-- Numbers ───────────────────────────────────────────────────────────── -->
+          <section id="numbers" class="scroll-mt-20">
+            <h3
+              class="mb-4 text-2xl font-semibold text-white"
+              t="Number formatting"
+              tContext="Section heading: locale-aware number formatting (digit-group separators)"
+            ></h3>
+            <app-example-card
+              [title]="
+                'Digit grouping per language'
+                  | t: { context: 'Card title. \'Digit grouping\' = the separators inside large numbers (1,000 vs 1.000 vs 1 000), which differ by language' }
+              "
+              [description]="
+                'The :number formatter groups digits the way each language expects: en 1,234,567 · de 1.234.567 · pl 1 234 567.'
+                  | t: { context: 'Card body. \':number\' is an ICU formatter token (keep verbatim); en/de/pl meaning English/German/Polish; the figures show how each language groups thousands' }
+              "
+              [tabs]="numberTabs"
+            >
+              <p class="text-slate-200">{{ msgPopulation | t: { params: { n: 1234567 } } }}</p>
+            </app-example-card>
+          </section>
+        </div>
+      </div>
+
+      <!-- ═══ Group: Advanced messages ═════════════════════════════════════════ -->
+      <div>
         <h2
-          class="mb-4 text-2xl font-semibold text-white"
-          t="Rich text (slot tags)"
-          tContext="Section heading. 'Rich text' = text with links/emphasis; 'slot tags' = the [name] bracket placeholders ng-linguo uses in translations"
+          class="mb-6 text-sm font-semibold uppercase tracking-wider text-indigo-400"
+          t="Advanced messages"
+          tContext="Section-group label: more advanced translation features — disambiguating identical words by context, and rich text with slot tags"
         ></h2>
-        <app-example-card
-          [title]="
-            'Links and emphasis without HTML in the dictionary'
-              | t: { context: 'Card title. \'emphasis\' = bold/italic styling; \'dictionary\' = the JSON translation file. The point: no HTML appears in translation files' }
-          "
-          [description]="
-            'Translators see named slots like [[name]…[[/name] — each binds to your own ng-template tFor, with no predefined HTML. Need a literal bracket in your prose? Double the opening one. Translator content is never inserted as HTML; XSS surface is zero by construction.'
-              | t: { context: 'Card body. \'named slots\' = the [name] bracket placeholders; keep \'ng-template tFor\' verbatim; \'literal bracket\' = a real [ character; \'XSS\' is the web-security term (keep); \'zero by construction\' = impossible by design. [[name] shows an escaped literal bracket — keep the doubled brackets' }
-          "
-          [tabs]="slotTabs"
-        >
-          <div class="space-y-2 text-slate-200 [&_a]:text-indigo-300 [&_a]:underline">
-            <p
-              t="Read the [docs]documentation[/docs] to get started"
-              tContext="Onboarding hint. [docs] wraps a link to the documentation — translate the wrapped word too and keep the [docs] tags around it"
+        <div class="space-y-12">
+          <!-- Context ────────────────────────────────────────────────────────── -->
+          <section id="context" class="scroll-mt-20">
+            <h3
+              class="mb-4 text-2xl font-semibold text-white"
+              t="Context (homonyms)"
+              tContext="Section heading. 'Context' = the translation disambiguation feature (gettext msgctxt); 'homonyms' = words spelled the same but meaning different things"
+            ></h3>
+            <app-example-card
+              [title]="
+                'Same word, different meaning' | t: { context: 'Card title about homonyms / disambiguation' }
+              "
+              [description]="
+                'A context label becomes part of the key (gettext calls it msgctxt) and also tells the translator which meaning you mean. Switch to Polish to see each one translated differently.'
+                  | t: { context: 'Card body. \'context\' is the ng-linguo option name (keep verbatim); \'key\' = lookup key; \'msgctxt\' is the gettext technical term (keep); the same English word can map to different translations' }
+              "
+              [tabs]="contextTabs"
             >
-              <ng-template tFor="docs" let-text>
-                <a href="https://nx.dev" target="_blank" rel="noreferrer">{{ text }}</a>
-              </ng-template>
-            </p>
-            <p
-              t="By continuing you agree to our [terms]Terms of Service[/terms]"
-              tContext="Consent line shown before sign-up. [terms] wraps a link; 'Terms of Service' is the standard name of the legal agreement — use the conventional target-language equivalent"
+              <ul class="space-y-1 text-slate-200">
+                <li>
+                  {{ 'Play' | t: { context: 'audio player' } }} / {{ 'Play' | t: { context: 'game' }
+                  }}
+                </li>
+                <li>
+                  {{ 'Right' | t: { context: 'direction' } }} / {{ 'Right' | t: { context: 'correct'
+                  } }}
+                </li>
+                <li>
+                  {{ 'Order' | t: { context: 'sequence' } }} / {{ 'Order' | t: { context: 'purchase'
+                  } }}
+                </li>
+                <li>
+                  {{ 'Free' | t: { context: 'no cost' } }} / {{ 'Free' | t: { context: 'available' }
+                  }}
+                </li>
+              </ul>
+            </app-example-card>
+          </section>
+
+          <!-- Slots ─────────────────────────────────────────────────────────────── -->
+          <section id="slots" class="scroll-mt-20">
+            <h3
+              class="mb-4 text-2xl font-semibold text-white"
+              t="Rich text (slot tags)"
+              tContext="Section heading. 'Rich text' = text with links/emphasis; 'slot tags' = the [name] bracket placeholders ng-linguo uses in translations"
+            ></h3>
+            <app-example-card
+              [title]="
+                'Links and bold text — with no HTML in your translation files'
+                  | t: { context: 'Card title. The point: links and styled text appear in the UI, but the translation files stay plain text with no HTML' }
+              "
+              [description]="
+                'Translators only ever see named slots like [[name]…[[/name] — never HTML tags. You bind each slot to your own ng-template tFor, so you decide what it renders as: a link, bold text, anything. Need a real bracket in your text? Type the opening one twice. Translated text is never inserted as HTML, so cross-site scripting (XSS) is impossible by design.'
+                  | t: { context: 'Card body. \'named slots\' = the [name] bracket placeholders; keep \'ng-template tFor\' verbatim; \'real bracket\' = a literal [ character; \'XSS\' is the web-security term (keep). [[name]…[[/name] is escaped so it shows as the literal text [name]…[/name] — keep the doubled brackets' }
+              "
+              [tabs]="slotTabs"
             >
-              <ng-template tFor="terms" let-text>
-                <a href="/terms">{{ text }}</a>
-              </ng-template>
-            </p>
-            <p
-              t="[warn]Warning:[/warn] this action cannot be undone"
-              tContext="Warning before a destructive, irreversible action. [warn] wraps the emphasized lead word 'Warning:'"
-            >
-              <ng-template tFor="warn" let-text>
-                <strong class="font-semibold text-amber-300">{{ text }}</strong>
-              </ng-template>
-            </p>
-            <!-- Escape demo: [[b] is a literal bracket; [b] still binds the slot. -->
-            <p
-              t="Escaped [[b]bold[[/b] stays literal — [b]this[/b] is a slot"
-              tContext="Demo of ng-linguo's slot syntax and its bracket escape. 'Escaped' is the programming sense (made literal via the [[ escape), not fleeing; 'stays literal' = shown as plain text; 'slot' = a fillable [name] region. [[b]bold[[/b] is escaped literal text, [b]this[/b] is a real slot — keep both forms exactly"
-            >
-              <ng-template tFor="b" let-text>
-                <strong class="font-semibold text-amber-300">{{ text }}</strong>
-              </ng-template>
-            </p>
-            <!-- Nesting demo: [b] sits inside [link]. *tRender renders the link's
+              <div class="space-y-2 text-slate-200 [&_a]:text-indigo-300 [&_a]:underline">
+                <p
+                  t="Read the [docs]documentation[/docs] to get started"
+                  tContext="Onboarding hint. [docs] wraps a link to the documentation — translate the wrapped word too and keep the [docs] tags around it"
+                >
+                  <ng-template tFor="docs" let-text>
+                    <a href="https://nx.dev" target="_blank" rel="noreferrer">{{ text }}</a>
+                  </ng-template>
+                </p>
+                <p
+                  t="By continuing you agree to our [terms]Terms of Service[/terms]"
+                  tContext="Consent line shown before sign-up. [terms] wraps a link; 'Terms of Service' is the standard name of the legal agreement — use the conventional target-language equivalent"
+                >
+                  <ng-template tFor="terms" let-text>
+                    <a href="/terms">{{ text }}</a>
+                  </ng-template>
+                </p>
+                <p
+                  t="[warn]Warning:[/warn] this action cannot be undone"
+                  tContext="Warning before a destructive, irreversible action. [warn] wraps the emphasized lead word 'Warning:'"
+                >
+                  <ng-template tFor="warn" let-text>
+                    <strong class="font-semibold text-amber-300">{{ text }}</strong>
+                  </ng-template>
+                </p>
+                <!-- Escape demo: [[b] is a literal bracket; [b] still binds the slot. -->
+                <p
+                  t="Escaped [[b]bold[[/b] stays literal — [b]this[/b] is a slot"
+                  tContext="Demo of ng-linguo's slot syntax and its bracket escape. 'Escaped' is the programming sense (made literal via the [[ escape), not fleeing; 'stays literal' = shown as plain text; 'slot' = a fillable [name] region. [[b]bold[[/b] is escaped literal text, [b]this[/b] is a real slot — keep both forms exactly"
+                >
+                  <ng-template tFor="b" let-text>
+                    <strong class="font-semibold text-amber-300">{{ text }}</strong>
+                  </ng-template>
+                </p>
+                <!-- Nesting demo: [b] sits inside [link]. *tRender renders the link's
                  children, so the nested slot binds its own template instead of
                  flattening to text. Switch language to see the order change. -->
-            <p
-              t="Agree to our [link]Terms and [b]Conditions[/b][/link]"
-              tContext="Consent line with a nested slot. [link] wraps a link to the Terms; [b] emphasizes a word inside it. 'Terms and Conditions' is the standard legal-document name — use the conventional target-language equivalent"
-            >
-              <ng-template tFor="link" let-kids="children">
-                <a href="/terms"><ng-container *tRender="kids"></ng-container></a>
-              </ng-template>
-              <ng-template tFor="b" let-text>
-                <strong class="font-semibold text-amber-300">{{ text }}</strong>
-              </ng-template>
-            </p>
-          </div>
-        </app-example-card>
-      </section>
+                <p
+                  t="Agree to our [link]Terms and [b]Conditions[/b][/link]"
+                  tContext="Consent line with a nested slot. [link] wraps a link to the Terms; [b] emphasizes a word inside it. 'Terms and Conditions' is the standard legal-document name — use the conventional target-language equivalent"
+                >
+                  <ng-template tFor="link" let-kids="children">
+                    <a href="/terms"><ng-container *tRender="kids"></ng-container></a>
+                  </ng-template>
+                  <ng-template tFor="b" let-text>
+                    <strong class="font-semibold text-amber-300">{{ text }}</strong>
+                  </ng-template>
+                </p>
+              </div>
+            </app-example-card>
+          </section>
+        </div>
+      </div>
 
-      <!-- ESLint & a11y ──────────────────────────────────────────────────────── -->
-      <section id="eslint" class="scroll-mt-20">
+      <!-- ═══ Group: Tooling & workflow ════════════════════════════════════════ -->
+      <div>
         <h2
-          class="mb-4 text-2xl font-semibold text-white"
-          t="ESLint & a11y"
-          tContext="Section heading. 'ESLint' is a tool name — keep verbatim; 'a11y' is the numeronym for accessibility (keep, or use the target word for accessibility)"
+          class="mb-6 text-sm font-semibold uppercase tracking-wider text-indigo-400"
+          t="Tooling & workflow"
+          tContext="Section-group label: the surrounding workflow — the ESLint setup and the extract/translate/compile pipeline"
         ></h2>
-        <app-example-card
-          [title]="
-            'Keep the linter happy with empty [t] elements'
-              | t: { context: 'Card title (colloquial). \'linter\' = ESLint; \'keep the linter happy\' = satisfy the lint rule; \'[t]\' is a code symbol (keep); \'empty elements\' = elements with no text content' }
-          "
-          [description]="
-            'The a11y rule @angular-eslint/template/elements-content flags empty headings, anchors, and buttons. A [t] element fills its text at runtime, so the source string can move out of the markup entirely — the headings on this page are empty [t] elements; only the hero keeps its text as a fallback.'
-              | t: { context: 'Card body. Keep verbatim: @angular-eslint/template/elements-content, [t]. \'a11y\' = accessibility; \'markup\' = HTML; \'fallback\' = the default shown before translations load; \'the hero\' = the large heading at the top of the page' }
-          "
-          [tabs]="eslintTabs"
-          [hasPreview]="false"
-        />
-      </section>
+        <div class="space-y-12">
+          <!-- ESLint & a11y ──────────────────────────────────────────────────── -->
+          <section id="eslint" class="scroll-mt-20">
+            <h3
+              class="mb-4 text-2xl font-semibold text-white"
+              t="ESLint & a11y"
+              tContext="Section heading. 'ESLint' is a tool name — keep verbatim; 'a11y' is the numeronym for accessibility (keep, or use the target word for accessibility)"
+            ></h3>
+            <app-example-card
+              [title]="
+                'Keep the accessibility linter happy with empty [t] elements'
+                  | t: { context: 'Card title (colloquial). \'accessibility linter\' = the ESLint a11y rule; \'keep it happy\' = satisfy the rule; \'[t]\' is a code symbol (keep); \'empty elements\' = elements with no text written in the HTML' }
+              "
+              [description]="
+                'Angular\'s accessibility rule @angular-eslint/template/elements-content warns about empty headings, links, and buttons. A [t] element gets its text at runtime, so you can leave the markup empty — every heading on this page is an empty [t] element, and only the hero keeps its text as a fallback shown before translations load.'
+                  | t: { context: 'Card body. Keep verbatim: @angular-eslint/template/elements-content, [t]. \'markup\' = the HTML you write; \'fallback\' = text shown before translations load; \'the hero\' = the large heading at the top of the page' }
+              "
+              [tabs]="eslintTabs"
+              [hasPreview]="false"
+            />
+          </section>
 
-      <!-- Translating with AI ─────────────────────────────────────────────── -->
-      <section id="translate" class="scroll-mt-20">
-        <h2
-          class="mb-4 text-2xl font-semibold text-white"
-          t="Translating with AI"
-          tContext="Section heading: translating the app automatically using an AI / LLM"
-        ></h2>
-        <app-example-card
-          [title]="
-            'From source string to translated catalog'
-              | t: { context: 'Card title. \'source string\' = the original English text; \'catalog\' = the translation file (.po)' }
-          "
-          [description]="
-            'The extract CLI keeps gettext .po catalogs and compiles them to runtime JSON. Translate by copying a prompt into any chat model, or fully automatically: point translator at a module that calls your own AI provider — ng-linguo writes the prompt and merges the reply, you keep the SDK and the API key. Omit translator and translation stays a clipboard copy/paste.'
-              | t: { context: 'Card body. Keep verbatim: extract CLI, gettext, .po, JSON, ng-linguo, SDK, API key, translator. \'catalogs\' = translation files; \'chat model\' = an LLM; \'merges the reply\' = applies the response; \'clipboard copy/paste\' = manual copying' }
-          "
-          [tabs]="translateTabs"
-          [hasPreview]="false"
-        />
-      </section>
+          <!-- Translation workflow ────────────────────────────────────────────── -->
+          <section id="translate" class="scroll-mt-20">
+            <h3
+              class="mb-4 text-2xl font-semibold text-white"
+              t="Translation workflow"
+              tContext="Section heading: the build-time CLI pipeline that turns source strings into translated files (extract, translate, compile)"
+            ></h3>
+            <app-example-card
+              [title]="
+                'From English source to translated files'
+                  | t: { context: 'Card title. \'English source\' = the original strings; \'translated files\' = the per-language .po/.json files' }
+              "
+              [description]="
+                'The extract CLI scans your source, keeps the strings in standard gettext .po files, and compiles them to the JSON the app loads. Re-running it is additive — new strings merge in, existing translations stay. Run it with no command for a guided menu, or as plain commands in CI. To translate, copy a ready-made prompt into any chat model, or point the translator option at a small module that calls your own AI provider — ng-linguo writes the prompt and merges the reply, and your SDK and API key never leave your machine.'
+                  | t: { context: 'Card body. Keep verbatim: extract CLI, gettext, .po, JSON, ng-linguo, SDK, API key, translator, CI. \'additive\' = re-running adds without overwriting; \'guided menu\' = the interactive CLI; \'chat model\' = an LLM such as ChatGPT/Gemini/Claude; \'merges the reply\' = applies the model\'s response back into the files' }
+              "
+              [tabs]="translateTabs"
+              [hasPreview]="false"
+            />
+          </section>
+        </div>
+      </div>
     </div>
 
     <footer
