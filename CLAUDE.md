@@ -19,8 +19,9 @@ The core API is a **SignalStore** (`@ngrx/signals`), not a service class.
 Consumers inject a store, read translations via signals, and the whole runtime
 is reactive without RxJS plumbing.
 
-Seed feature: BBCode-style placeholders bound to `<ng-template>` so translators
-never see HTML. Planned scope also includes: ICU pluralization, type-safe
+Seed feature: named slot tags (a BBCode-like `[name]...[/name]` syntax) bound to
+`<ng-template>` so translators never see HTML. Planned scope also includes: ICU
+pluralization, type-safe
 translation keys, async loaders, lazy scopes, an extraction CLI.
 
 The audience is Angular developers building production apps. Every API
@@ -81,7 +82,7 @@ ng-linguo/
 ├── packages/
 │   ├── linguo/                → @ng-linguo/linguo (the Angular runtime)
 │   │   ├── src/               → primary entry point: TranslateStore, t pipe,
-│   │   │                         [t] directive, BBCode parser, public types
+│   │   │                         [t] directive, slot parser, public types
 │   │   ├── icu/               → @ng-linguo/linguo/icu  (ICU MF1/MF2, provideIcu)
 │   │   └── http/              → @ng-linguo/linguo/http (createHttpLoader)
 │   ├── extract/               → @ng-linguo/extract (CLI; pure Node, zero Angular deps)
@@ -140,7 +141,7 @@ ng-linguo/
 ### 2.2 What goes in the primary entry point vs. `/icu`, `/http`
 
 - The **primary** (`@ng-linguo/linguo`) contains: `TranslateStore` (SignalStore),
-  the `[t]` directive, the BBCode parser, the public types, the loader interface,
+  the `[t]` directive, the slot parser, the public types, the loader interface,
   the `MessageFormatter` interface + token.
 - The primary does **not** contain: ICU formatting, HTTP loaders, route
   integration. ICU lives in the `/icu` entry point; the HTTP loader in `/http`.
@@ -235,7 +236,7 @@ class MyComp {
   `*.directive.ts`, `*.pipe.ts`.
 - SignalStore files: `*.store.ts` (e.g. `translate.store.ts`).
   SignalStore features: `with-*.ts` (e.g. `with-loader.ts`,
-  `with-bbcode-parser.ts`) — matches the `withFoo()` convention from NgRx.
+  `with-slot-parser.ts`) — matches the `withFoo()` convention from NgRx.
 - Symbols: `PascalCase` for classes/types/interfaces/stores, `camelCase` for
   variables/functions/features, `SCREAMING_SNAKE_CASE` for module-level
   constants only.
@@ -274,7 +275,7 @@ class MyComp {
   function in `extract`: 100% line coverage is not the goal, but every branch
   of the public API must have at least one test exercising it.
 - Every bug fix ships with a regression test. No exceptions.
-- The BBCode parser is the canary — it has a dedicated test file with cases
+- The slot parser is the canary — it has a dedicated test file with cases
   for every grammar rule and every malformed-input tolerance. Treat it as a
   reference for the quality bar.
 
@@ -282,7 +283,7 @@ class MyComp {
 
 - Unit tests with Jest. Component DOM tests with Angular Testing Library.
 - **No `TestBed` for pure functions.** If something can be tested without
-  Angular, test it without Angular. The BBCode parser, the normalizer, and
+  Angular, test it without Angular. The slot parser, the normalizer, and
   the extractor are pure-Node tests.
 - **SignalStores are tested with `TestBed.configureTestingModule`** providing
   the store, then asserting on its signals via `store.someSignal()` and
@@ -323,13 +324,16 @@ These protect the _product_, not just code quality:
   nodes or template context. The `innerHTML` setter is **forbidden** for
   translator content. CI greps for `innerHTML` in `packages/linguo/src` and
   fails the build.
-- BBCode placeholders are `[name]...[/name]` with `name` matching
-  `[a-zA-Z_][a-zA-Z0-9_-]*`. This grammar is part of the public contract;
-  changing it is a major version bump.
+- Slot tags are `[name]...[/name]` with `name` matching
+  `[a-zA-Z_][a-zA-Z0-9_-]*` (a BBCode-like syntax, but the names are arbitrary
+  and author-chosen — they identify slots to fill, not tags with predefined
+  HTML). A literal `[` is written as `[[` (the only escape; a lone `]` is never
+  significant). This grammar is part of the public contract; changing it is a
+  major version bump.
 
 ### 5.2 Extraction parity
 
-- The runtime normalizer (source → BBCode key) and the extractor normalizer
+- The runtime normalizer (source → slot key) and the extractor normalizer
   **must produce identical output** for the same input. There is a shared
   test fixture (`tests/fixtures/normalization-cases.json`) consumed by both
   test suites. When you add a normalization rule to one side, you add the
@@ -365,8 +369,8 @@ These protect the _product_, not just code quality:
   current public surface before adding to it.
 - For anything touching the store: read `packages/linguo/src/translate.store.ts`
   and the relevant `with-*.ts` features before adding code.
-- If a task involves the parser, normalizer, or BBCode grammar, read
-  `packages/linguo/src/bbcode-parser.ts` and its tests before touching anything.
+- If a task involves the parser, normalizer, or slot-tag grammar, read
+  `packages/linguo/src/slot-parser.ts` and its tests before touching anything.
 
 ### 6.2 Before committing
 
@@ -422,8 +426,8 @@ Claude should **stop and ask** before:
 - Adding a new public method or signal to `TranslateStore`.
 - Adding a new package to the monorepo.
 - Introducing a new runtime dependency.
-- Changing the BBCode grammar or JSON file format.
-- Touching anything in `packages/linguo/src/bbcode-parser.ts`.
+- Changing the slot-tag grammar or JSON file format.
+- Touching anything in `packages/linguo/src/slot-parser.ts`.
 - Changing the SignalStore's shape (state, methods, features composition).
 - Changing CI configuration.
 

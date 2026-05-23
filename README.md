@@ -1,3 +1,11 @@
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/jmwierzbicki/linguo/main/apps/playground/public/linguo-logo.png"
+    alt="ng-linguo"
+    width="640"
+  />
+</p>
+
 # ng-linguo
 
 **Signal-native internationalization for Angular.** A modern, complete i18n
@@ -21,10 +29,10 @@ zero RxJS plumbing in your components.
 - **Signals, not subscriptions.** Translations are reactive through
   [`@ngrx/signals`](https://ngrx.io/guide/signals) — switch language and the UI
   updates, no `async` pipe or `Subscription` bookkeeping.
-- **Translators never see HTML.** BBCode placeholders `[name]…[/name]` bind to
-  _your_ `<ng-template>`, so links, buttons, and bindings render as real Angular
-  while the translation file stays plain text. Translator content is never
-  inserted as HTML — XSS surface is zero by construction.
+- **Translators never see HTML.** Named slots `[name]…[/name]` (a BBCode-like
+  syntax) bind to _your_ `<ng-template>`, so links, buttons, and bindings render
+  as real Angular while the translation file stays plain text. Translator
+  content is never inserted as HTML — XSS surface is zero by construction.
 - **ICU MessageFormat 2** (and MF1) for correct plurals, `select`, and gendered
   text per locale — Polish gets four plural forms, English gets two, all from
   one message.
