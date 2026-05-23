@@ -21,13 +21,17 @@ zero RxJS plumbing in your components.
 ```
 
 <p align="center">
-  <img
-    src="https://raw.githubusercontent.com/jmwierzbicki/linguo/main/apps/playground/public/linguo-demo.gif"
-    alt="Switching languages in the ng-linguo playground — every example re-renders reactively"
-    width="800"
-  />
+  <a href="https://jmwierzbicki.github.io/linguo/">
+    <img
+      src="https://raw.githubusercontent.com/jmwierzbicki/linguo/main/apps/playground/public/linguo-demo.gif"
+      alt="Switching languages in the ng-linguo playground — every example re-renders reactively"
+      width="800"
+    />
+  </a>
   <br />
   <em>Switch the language and every binding re-renders — no reload, no subscriptions.</em>
+  <br />
+  <strong><a href="https://jmwierzbicki.github.io/linguo/">▶ Try the live demo</a></strong>
 </p>
 
 > **Status:** pre-release (`0.9.0`), not yet published to npm. The runtime, the
