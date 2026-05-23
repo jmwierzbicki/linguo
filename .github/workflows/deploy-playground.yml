@@ -1,0 +1,63 @@
+name: Deploy Playground
+
+on:
+  push:
+    branches:
+      - main
+  # Allow manual runs from the Actions tab.
+  workflow_dispatch:
+
+# GITHUB_TOKEN permissions needed to deploy to GitHub Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deploy at a time; let an in-progress run finish rather than
+# cancelling it mid-publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      # Project pages are served from https://<user>.github.io/linguo/, so the
+      # app must be built with a matching base href.
+      - name: Build playground
+        run: pnpm exec nx build playground --base-href=/linguo/
+
+      - name: Prepare Pages artifact
+        run: |
+          dist=dist/apps/playground/browser
+          # SPA fallback: GitHub Pages serves 404.html for unknown paths, so
+          # routing deep links resolve to the app instead of a 404.
+          cp "$dist/index.html" "$dist/404.html"
+          # Disable Jekyll so files/folders beginning with _ are served as-is.
+          touch "$dist/.nojekyll"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/apps/playground/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
